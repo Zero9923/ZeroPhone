@@ -2,11 +2,9 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <!-- 优化移动端视口，防止缩放 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ZeroPhone</title>
+    <title>Zero</title>
     
-    <!-- ✨ PWA 核心魔法：引入 manifest 和状态栏颜色 ✨ -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#fafafa">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -23,15 +21,15 @@
 </head>
 <body class="bg-zinc-900 min-h-screen flex items-center justify-center font-sans overflow-hidden">
     
-    <!-- 纯界面容器 -->
     <div class="w-full h-[100dvh] max-w-[430px] sm:w-[390px] sm:h-[844px] bg-zinc-50 sm:rounded-[3rem] shadow-2xl relative overflow-hidden p-6 flex flex-col box-border">
         
         <!-- 第一部分：顶部组件 -->
         <div class="bg-white border border-zinc-200 rounded-[24px] p-5 grid grid-cols-2 gap-5 shadow-sm min-h-[180px] box-border w-full">
             <div class="flex flex-col h-full min-w-0 justify-between">
                 <div>
-                    <input value="ZeroPhone" class="text-base font-extrabold text-black bg-transparent w-full mb-0 truncate outline-none tracking-widest" />
-                    <input value="Your Personal AI Assistant" class="text-[9px] text-zinc-500 bg-transparent w-full mb-2 truncate outline-none" />
+                    <!-- ✨ 给输入框加上了 id 和 onchange 事件，一旦修改自动保存 ✨ -->
+                    <input id="app-title" onchange="saveText('app-title')" value="ZeroPhone" class="text-base font-extrabold text-black bg-transparent w-full mb-0 truncate outline-none tracking-widest" />
+                    <input id="app-subtitle" onchange="saveText('app-subtitle')" value="Your Personal AI Assistant" class="text-[9px] text-zinc-500 bg-transparent w-full mb-2 truncate outline-none" />
                 </div>
                 <div class="bg-zinc-50 border border-zinc-100 rounded-[12px] p-2 flex-1 flex flex-col justify-center min-h-0">
                     <div id="calendar-container" class="grid grid-cols-7 gap-y-[2px] w-full mt-0.5"></div>
@@ -39,7 +37,10 @@
             </div>
             <div class="flex flex-col h-full relative min-w-0 justify-between">
                 <div class="absolute -top-1 right-0 text-lg font-light text-black">24°C</div>
-                <textarea class="mt-6 text-[10px] text-center text-zinc-600 bg-transparent resize-none no-scrollbar outline-none w-full leading-snug font-bold" rows="2">Good Morning!&#10;Ready to explore?</textarea>
+                
+                <!-- ✨ 同样的，文本域也加上记忆功能 ✨ -->
+                <textarea id="app-greeting" onchange="saveText('app-greeting')" class="mt-6 text-[10px] text-center text-zinc-600 bg-transparent resize-none no-scrollbar outline-none w-full leading-snug font-bold" rows="2">Good Morning!&#10;Ready to explore?</textarea>
+                
                 <div class="flex flex-col gap-1.5 w-full">
                     <div class="bg-zinc-50 border border-zinc-100 rounded-[10px] py-1.5 px-2 flex flex-col items-center justify-center text-[9px] font-bold text-black text-center w-full leading-tight min-h-[38px]">
                         <span>Today is Wednesday,</span><span>March 18, 2026</span>
@@ -91,7 +92,9 @@
         </div>
     </div>
 
+    <!-- 核心魔法逻辑区 -->
     <script>
+        // --- 1. 日历渲染 ---
         const calendarContainer = document.getElementById('calendar-container');
         let calHtml = '';
         ['S','M','T','W','T','F','S'].forEach(d => { calHtml += `<div class="text-zinc-400 text-center text-[6px] font-bold mb-0.5">${d}</div>`; });
@@ -102,18 +105,79 @@
         }
         calendarContainer.innerHTML = calHtml;
 
+        // --- 2. 永久记忆功能 (页面加载时触发) ---
+        window.addEventListener('DOMContentLoaded', () => {
+            // 恢复文字
+            ['app-title', 'app-subtitle', 'app-greeting'].forEach(id => {
+                const saved = localStorage.getItem(id);
+                if (saved !== null) document.getElementById(id).value = saved;
+            });
+            // 恢复照片
+            ['photo1', 'photo2'].forEach(id => {
+                const saved = localStorage.getItem(id);
+                if (saved) document.getElementById(id).src = saved;
+            });
+        });
+
+        // 保存文字的函数
+        function saveText(id) {
+            localStorage.setItem(id, document.getElementById(id).value);
+        }
+
+        // --- 3. 照片处理 (带压缩和记忆) ---
         function handlePhotoClick(event, imgId, inputId) {
             event.stopPropagation();
             const url = prompt("请输入图片URL链接 (留空或点击取消则选择本地照片):");
-            if (url) { document.getElementById(imgId).src = url; } 
-            else { document.getElementById(inputId).click(); }
+            if (url) { 
+                document.getElementById(imgId).src = url; 
+                localStorage.setItem(imgId, url); // 保存URL记忆
+            } else { 
+                document.getElementById(inputId).click(); 
+            }
         }
 
+        // 自动压缩并保存本地照片
         function handleFileUpload(event, imgId) {
             const file = event.target.files[0];
-            if (file) { document.getElementById(imgId).src = URL.createObjectURL(file); }
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    // 创建画布压缩图片 (防止手机高像素照片撑爆缓存)
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 600; // 压缩宽度
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > MAX_WIDTH) {
+                        height = Math.round(height * MAX_WIDTH / width);
+                        width = MAX_WIDTH;
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // 转化为 Base64 字符串
+                    const base64Data = canvas.toDataURL('image/jpeg', 0.8);
+                    
+                    // 显示并保存
+                    document.getElementById(imgId).src = base64Data;
+                    try {
+                        localStorage.setItem(imgId, base64Data);
+                    } catch (err) {
+                        console.error('保存失败:', err);
+                        alert('图片太大了宝宝！建议换一张小一点的图哦～');
+                    }
+                }
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         }
 
+        // --- 4. 丝滑洗牌 ---
         function swapPolaroids() {
             const p1 = document.getElementById('polaroid-1'), p2 = document.getElementById('polaroid-2');
             ['-rotate-6', 'rotate-6', 'left-2', 'right-2', 'top-2', 'top-6', 'z-0', 'z-10', 'shadow-md', 'shadow-lg'].forEach(cls => {
@@ -121,14 +185,10 @@
             });
         }
 
-        // ✨ PWA 注册 Service Worker ✨
+        // --- 5. PWA 注册 ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js').then(reg => {
-                    console.log('PWA Service Worker 注册成功!', reg);
-                }).catch(err => {
-                    console.log('注册失败:', err);
-                });
+                navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW注册失败', err));
             });
         }
     </script>
