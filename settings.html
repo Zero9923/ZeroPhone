@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ZeroPhone 设置</title>
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'SimSun', 'Songti SC', 'STSong', serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        * { -webkit-tap-highlight-color: transparent; }
+        
+        /* 极致简约的黑白开关按钮样式 */
+        .toggle-checkbox:checked { right: 0; border-color: #000; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #000; }
+        .toggle-checkbox { right: 0; z-index: 1; border-color: #e4e4e7; transition: all 0.3s; }
+        .toggle-label { background-color: #e4e4e7; transition: all 0.3s; }
+    </style>
+</head>
+<body class="bg-zinc-900 min-h-screen flex items-center justify-center font-sans overflow-hidden">
+    
+    <div class="w-full h-[100dvh] max-w-[430px] sm:w-[390px] sm:h-[844px] bg-zinc-50 sm:rounded-[3rem] shadow-2xl relative overflow-hidden flex flex-col box-border">
+
+        <!-- --- 顶部导航栏 --- -->
+        <!-- 包含返回按钮和页面标题 -->
+        <div class="px-6 pt-14 pb-4 flex items-center justify-between bg-white border-b border-zinc-200 z-10 shadow-sm">
+            <!-- 点击返回主界面 -->
+            <div onclick="window.location.href='index.html'" class="flex items-center gap-1 cursor-pointer text-zinc-400 hover:text-black transition-colors active:scale-95">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
+                <span class="text-sm font-bold mt-0.5 tracking-widest">返回</span>
+            </div>
+            <h1 class="text-base font-extrabold tracking-widest text-black">设置</h1>
+            <div class="w-10"></div> <!-- 占位符，保证标题绝对居中 -->
+        </div>
+
+        <!-- --- 可滑动的设置列表 --- -->
+        <div class="flex-1 overflow-y-auto no-scrollbar p-6 flex flex-col gap-8 pb-20">
+            
+            <!-- 1. 用户资料卡片 -->
+            <div class="bg-white border border-zinc-200 rounded-[20px] p-5 shadow-sm flex items-center gap-4 cursor-pointer active:scale-95 transition-transform">
+                <!-- 头像框 -->
+                <div class="w-14 h-14 bg-zinc-50 rounded-[14px] flex items-center justify-center border border-zinc-200 overflow-hidden">
+                    <svg class="w-7 h-7 text-zinc-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+                </div>
+                <div>
+                    <!-- 这里会神奇地自动读取你主界面设置的名字！ -->
+                    <div class="text-base font-extrabold text-black tracking-widest" id="display-name">Zero User</div>
+                    <div class="text-[10px] text-zinc-400 mt-1 font-sans tracking-wide">ZeroPhone ID / 云云空间</div>
+                </div>
+            </div>
+
+            <!-- 2. 常规设置组 -->
+            <div class="flex flex-col gap-2">
+                <h2 class="text-[10px] font-extrabold text-zinc-400 px-3 tracking-widest uppercase">General / 常规设置</h2>
+                <div class="bg-white border border-zinc-200 rounded-[20px] overflow-hidden shadow-sm">
+                    <!-- 设置项：飞行模式 -->
+                    <div class="px-5 py-4 flex items-center justify-between border-b border-zinc-100">
+                        <span class="text-sm font-bold text-black tracking-wider">Zero 勿扰模式</span>
+                        <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                            <input type="checkbox" name="toggle" id="toggle1" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                            <label for="toggle1" class="toggle-label block overflow-hidden h-5 rounded-full cursor-pointer"></label>
+                        </div>
+                    </div>
+                    <!-- 设置项：Wi-Fi -->
+                    <div class="px-5 py-4 flex items-center justify-between border-b border-zinc-100 cursor-pointer active:bg-zinc-50">
+                        <span class="text-sm font-bold text-black tracking-wider">无线网络</span>
+                        <div class="flex items-center gap-2 text-zinc-500">
+                            <span class="text-[11px] font-sans">Zero-Fi_5G</span>
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                        </div>
+                    </div>
+                    <!-- 设置项：极简显示 -->
+                    <div class="px-5 py-4 flex items-center justify-between">
+                        <span class="text-sm font-bold text-black tracking-wider">高奢黑白 UI</span>
+                        <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                            <!-- 默认打开状态 -->
+                            <input type="checkbox" name="toggle" id="toggle2" checked class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                            <label for="toggle2" class="toggle-label block overflow-hidden h-5 rounded-full cursor-pointer"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. 关于本机组 -->
+            <div class="flex flex-col gap-2">
+                <div class="bg-white border border-zinc-200 rounded-[20px] overflow-hidden shadow-sm">
+                    <div class="px-5 py-4 flex items-center justify-between border-b border-zinc-100 cursor-pointer active:bg-zinc-50">
+                        <span class="text-sm font-bold text-black tracking-wider">关于本机</span>
+                        <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                    </div>
+                    <div class="px-5 py-4 flex items-center justify-between border-b border-zinc-100">
+                        <span class="text-sm font-bold text-black tracking-wider">存储空间</span>
+                        <span class="text-[11px] text-zinc-400 font-sans tracking-widest">256 GB</span>
+                    </div>
+                    <div class="px-5 py-4 flex items-center justify-between">
+                        <span class="text-sm font-bold text-black tracking-wider">系统版本</span>
+                        <span class="text-[11px] text-zinc-400 font-sans tracking-widest">ZeroOS 1.0</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // 神奇的小细节：读取你在主页设置的名称！
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedName = localStorage.getItem('app-title');
+            if(savedName) {
+                // 如果你在主页把 ZeroPhone 改成了你的名字，这里也会变成你的名字！
+                document.getElementById('display-name').innerText = savedName;
+            }
+        });
+    </script>
+</body>
+</html>
