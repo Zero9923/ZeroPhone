@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ZeroPhone AI - 极简移动端适配版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'SimSun', 'Songti SC', 'STSong', serif;
+        }
+        input:focus, textarea:focus { 
+            outline: 1px dashed #d4d4d8; 
+            outline-offset: -1px; 
+            border-radius: 4px; 
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        /* 确保移动端不出现奇怪的高亮或滚动 */
+        * { -webkit-tap-highlight-color: transparent; }
+    </style>
+</head>
+<!-- 外部背景 -->
+<body class="bg-zinc-900 min-h-screen flex items-center justify-center font-sans overflow-hidden">
+    
+    <!-- ✨ 核心修改：真正的移动端自适应 ✨
+         手机端：满宽满高 (w-full h-[100dvh])，无直角；
+         电脑端：模拟手机壳大小 (sm:w-[390px] sm:h-[844px] sm:rounded-[3rem]) 
+    -->
+    <div class="w-full h-[100dvh] max-w-[430px] sm:w-[390px] sm:h-[844px] bg-zinc-50 sm:rounded-[3rem] shadow-2xl relative overflow-hidden p-6 flex flex-col box-border">
+        
+        <!-- --- 第一部分：顶部组件 --- -->
+        <!-- ✨ 核心修改：加大了 padding (p-5)，加高了高度 (min-h-[180px])，彻底解决贴边问题！ -->
+        <div class="bg-white border border-zinc-200 rounded-[24px] p-5 grid grid-cols-2 gap-5 shadow-sm min-h-[180px] box-border w-full">
+            
+            <!-- 左半部分 -->
+            <div class="flex flex-col h-full min-w-0 justify-between">
+                <div>
+                    <input 
+                        value="ZeroPhone"
+                        class="text-base font-extrabold text-black bg-transparent w-full mb-0 truncate outline-none tracking-widest"
+                    />
+                    <!-- 加大了底下的 margin，让文字和日历分开 -->
+                    <input 
+                        value="Your Personal AI Assistant"
+                        class="text-[9px] text-zinc-500 bg-transparent w-full mb-2 truncate outline-none"
+                    />
+                </div>
+                <!-- ✨ 日历内部也增加了 padding (p-2)，四周不再拥挤 -->
+                <div class="bg-zinc-50 border border-zinc-100 rounded-[12px] p-2 flex-1 flex flex-col justify-center min-h-0">
+                    <div id="calendar-container" class="grid grid-cols-7 gap-y-[2px] w-full mt-0.5">
+                        <!-- JS 自动生成 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右半部分 -->
+            <div class="flex flex-col h-full relative min-w-0 justify-between">
+                <!-- 气温微微调整位置，保持呼吸感 -->
+                <div class="absolute -top-1 right-0 text-lg font-light text-black">
+                    24°C
+                </div>
+                
+                <textarea 
+                    class="mt-6 text-[10px] text-center text-zinc-600 bg-transparent resize-none no-scrollbar outline-none w-full leading-snug font-bold"
+                    rows="2"
+                >Good Morning!&#10;Ready to explore?</textarea>
+
+                <!-- 底部矩形：高度微调到 38px，配合外部的 p-5，现在离四周有完美的留白距离！ -->
+                <div class="flex flex-col gap-1.5 w-full">
+                    <div class="bg-zinc-50 border border-zinc-100 rounded-[10px] py-1.5 px-2 flex flex-col items-center justify-center text-[9px] font-bold text-black text-center w-full leading-tight min-h-[38px]">
+                        <span>Today is Wednesday,</span>
+                        <span>March 18, 2026</span>
+                    </div>
+                    <div class="bg-zinc-50 border border-zinc-100 rounded-[10px] py-1.5 px-2 flex items-center justify-center text-[9.5px] font-bold text-black text-center w-full leading-tight min-h-[38px]">
+                        The sun will set at 3:34 PM
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- --- 第二部分：中间组件 (洗牌拍立得 + 极简图标) --- -->
+        <!-- 因为移动端满高，给这里稍微多一点上边距 -->
+        <div class="mt-10 flex gap-4 h-40 relative">
+            <div class="w-1/2 relative flex items-center justify-center">
+                <input type="file" accept="image/*" id="fileInput1" class="hidden" onchange="handleFileUpload(event, 'photo1')" />
+                <input type="file" accept="image/*" id="fileInput2" class="hidden" onchange="handleFileUpload(event, 'photo2')" />
+                
+                <div id="polaroid-1" onclick="swapPolaroids()" class="absolute bg-white p-2 pb-8 rounded-sm shadow-md transform -rotate-6 transition-all duration-300 hover:scale-105 cursor-pointer w-28 h-32 left-2 top-2 border border-zinc-200 z-0">
+                    <img id="photo1" onclick="handlePhotoClick(event, 'photo1', 'fileInput1')" src="https://images.unsplash.com/photo-1707343843437-caacff5cfa74?q=80&w=200&auto=format&fit=crop" class="w-full h-full object-cover bg-zinc-100 hover:opacity-80 transition-opacity" title="点击更换图片" alt="polaroid-1" />
+                </div>
+                
+                <div id="polaroid-2" onclick="swapPolaroids()" class="absolute bg-white p-2 pb-8 rounded-sm shadow-lg transform rotate-6 transition-all duration-300 hover:scale-105 cursor-pointer w-28 h-32 right-2 top-6 border border-zinc-200 z-10">
+                    <img id="photo2" onclick="handlePhotoClick(event, 'photo2', 'fileInput2')" src="https://images.unsplash.com/photo-1682687982501-1e58b814714c?q=80&w=200&auto=format&fit=crop" class="w-full h-full object-cover bg-zinc-100 hover:opacity-80 transition-opacity" title="点击更换图片" alt="polaroid-2" />
+                </div>
+            </div>
+
+            <div class="w-1/2 grid grid-cols-2 grid-rows-2 gap-3">
+                <div class="flex flex-col items-center justify-center gap-1">
+                    <div class="w-12 h-12 bg-white border border-zinc-200 rounded-[14px] shadow-sm flex items-center justify-center text-black">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h3M11 21l5-10 5 10M12.751 15h4.498" /></svg>
+                    </div>
+                    <span class="text-[10px] font-bold text-zinc-600">Lingo</span>
+                </div>
+                <div class="flex flex-col items-center justify-center gap-1">
+                    <div class="w-12 h-12 bg-white border border-zinc-200 rounded-[14px] shadow-sm flex items-center justify-center text-black">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                    </div>
+                    <span class="text-[10px] font-bold text-zinc-600">World Book</span>
+                </div>
+                <div class="flex flex-col items-center justify-center gap-1">
+                    <div class="w-12 h-12 bg-white border border-zinc-200 rounded-[14px] shadow-sm flex items-center justify-center text-black">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" /></svg>
+                    </div>
+                    <span class="text-[10px] font-bold text-zinc-600">API</span>
+                </div>
+                <div class="flex flex-col items-center justify-center gap-1">
+                    <div class="w-12 h-12 bg-white border border-zinc-200 rounded-[14px] shadow-sm flex items-center justify-center text-black">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" /></svg>
+                    </div>
+                    <span class="text-[10px] font-bold text-zinc-600">FaceMeet</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- --- 第三部分：底部的 Dock 栏 --- -->
+        <!-- 根据移动端高度，调整了一下 bottom 的距离，保证不会被全面屏手势条挡住 -->
+        <div class="absolute bottom-8 left-6 right-6 h-[72px] bg-white/70 backdrop-blur-xl rounded-[2rem] flex items-center justify-between px-6 shadow-sm border border-white/50">
+            <div class="w-12 h-12 bg-white rounded-[14px] shadow-sm flex items-center justify-center text-black border border-zinc-100">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+            </div>
+            <div class="w-12 h-12 bg-white rounded-[14px] shadow-sm flex items-center justify-center text-black border border-zinc-100">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            </div>
+            <div class="w-12 h-12 bg-white rounded-[14px] shadow-sm flex items-center justify-center text-black border border-zinc-100">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+            </div>
+            <div class="w-12 h-12 bg-white rounded-[14px] shadow-sm flex items-center justify-center text-black border border-zinc-100">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const calendarContainer = document.getElementById('calendar-container');
+        let calHtml = '';
+        const weekDays = ['S','M','T','W','T','F','S'];
+        weekDays.forEach(d => {
+            calHtml += `<div class="text-zinc-400 text-center text-[6px] font-bold mb-0.5">${d}</div>`;
+        });
+        for(let i=1; i<=31; i++) {
+            const isToday = i === 18;
+            const textClass = isToday 
+                ? 'bg-black text-white rounded-full w-[13px] h-[13px] font-bold flex items-center justify-center text-[7px] shadow-sm' 
+                : 'text-zinc-600 flex items-center justify-center text-[7px] font-bold';
+            calHtml += `<div class="flex items-center justify-center h-full"><span class="${textClass}">${i}</span></div>`;
+        }
+        calendarContainer.innerHTML = calHtml;
+
+        function handlePhotoClick(event, imgId, inputId) {
+            event.stopPropagation();
+            const url = prompt("请输入图片URL链接 (留空或点击取消则选择本地照片):");
+            if (url) {
+                document.getElementById(imgId).src = url;
+            } else {
+                document.getElementById(inputId).click();
+            }
+        }
+
+        function handleFileUpload(event, imgId) {
+            const file = event.target.files[0];
+            if (file) {
+                const objectUrl = URL.createObjectURL(file);
+                document.getElementById(imgId).src = objectUrl;
+            }
+        }
+
+        function swapPolaroids() {
+            const p1 = document.getElementById('polaroid-1');
+            const p2 = document.getElementById('polaroid-2');
+            
+            const classesToToggle = [
+                '-rotate-6', 'rotate-6',
+                'left-2', 'right-2',
+                'top-2', 'top-6',
+                'z-0', 'z-10',
+                'shadow-md', 'shadow-lg'
+            ];
+            
+            classesToToggle.forEach(cls => {
+                p1.classList.toggle(cls);
+                p2.classList.toggle(cls);
+            });
+        }
+    </script>
+</body>
+</html>
