@@ -87,77 +87,67 @@
     </div>
 
     <script>
-        const calendarContainer = document.getElementById('calendar-container');
-        let calHtml = '';
-        ['S','M','T','W','T','F','S'].forEach(d => { calHtml += `<div class="text-zinc-400 text-center text-[6px] font-bold mb-0.5">${d}</div>`; });
-        for(let i=1; i<=31; i++) {
-            const isToday = i === 18;
-            const textClass = isToday ? 'bg-black text-white rounded-full w-[13px] h-[13px] font-bold flex items-center justify-center text-[7px] shadow-sm' : 'text-zinc-600 flex items-center justify-center text-[7px] font-bold';
-            calHtml += `<div class="flex items-center justify-center h-full"><span class="${textClass}">${i}</span></div>`;
-        }
-        calendarContainer.innerHTML = calHtml;
+        // 1. 日历生成
+const calendarContainer = document.getElementById('calendar-container');
+let calHtml = '';
+['S','M','T','W','T','F','S'].forEach(d => { calHtml += `<div class="text-zinc-400 text-center text-[6px] font-bold mb-0.5">${d}</div>`; });
+for(let i=1; i<=31; i++) {
+    const isToday = i === 18;
+    const textClass = isToday ? 'bg-black text-white rounded-full w-[13px] h-[13px] font-bold flex items-center justify-center text-[7px] shadow-sm' : 'text-zinc-600 flex items-center justify-center text-[7px] font-bold';
+    calHtml += `<div class="flex items-center justify-center h-full"><span class="${textClass}">${i}</span></div>`;
+}
+calendarContainer.innerHTML = calHtml;
 
-        window.addEventListener('DOMContentLoaded', () => {
-            // 当返回主页时，确保有一点点入场动画
-            const screen = document.getElementById('phone-screen');
-            screen.style.transform = 'scale(1)';
-            screen.style.opacity = '1';
+// ✨ 2. 核心黑科技：静默预加载 (页面一打开，就偷偷把设置页面藏好) ✨
+window.addEventListener('DOMContentLoaded', async () => {
+    // 恢复文字和图片记忆
+    ['app-title', 'app-subtitle', 'app-greeting'].forEach(id => { const s = localStorage.getItem(id); if(s) document.getElementById(id).value = s; });
+    ['photo1', 'photo2'].forEach(id => { const s = localStorage.getItem(id); if(s) document.getElementById(id).src = s; });
 
-            ['app-title', 'app-subtitle', 'app-greeting'].forEach(id => {
-                const saved = localStorage.getItem(id);
-                if (saved !== null) document.getElementById(id).value = saved;
-            });
-            ['photo1', 'photo2'].forEach(id => {
-                const saved = localStorage.getItem(id);
-                if (saved) document.getElementById(id).src = saved;
-            });
-        });
+    try {
+        // 偷偷去获取分离开的设置文件
+        const response = await fetch('settings.html');
+        const htmlText = await response.text();
+        // 提前把它装进空盒子里，藏在屏幕右边！
+        const container = document.getElementById('dynamic-app-container');
+        container.innerHTML = htmlText;
+        container.style.pointerEvents = 'auto'; // 激活点击
+    } catch (e) {
+        console.log("预加载设置页面失败，宝宝检查一下文件名对不对哦~");
+    }
+});
 
-        function saveText(id) { localStorage.setItem(id, document.getElementById(id).value); }
+function saveText(id) { localStorage.setItem(id, document.getElementById(id).value); }
 
-        function handlePhotoClick(event, imgId, inputId) {
-            event.stopPropagation();
-            const url = prompt("请输入图片URL链接:");
-            if (url) { document.getElementById(imgId).src = url; localStorage.setItem(imgId, url); } else { document.getElementById(inputId).click(); }
-        }
-        function handleFileUpload(event, imgId) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width, height = img.height;
-                    if (width > 600) { height = Math.round(height * 600 / width); width = 600; }
-                    canvas.width = width; canvas.height = height;
-                    canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-                    const base64 = canvas.toDataURL('image/jpeg', 0.8);
-                    document.getElementById(imgId).src = base64;
-                    try { localStorage.setItem(imgId, base64); } catch (err) {}
-                }
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-        function swapPolaroids() {
-            const p1 = document.getElementById('polaroid-1'), p2 = document.getElementById('polaroid-2');
-            ['-rotate-6', 'rotate-6', 'left-2', 'right-2', 'top-2', 'top-6', 'z-0', 'z-10', 'shadow-md', 'shadow-lg'].forEach(cls => {
-                p1.classList.toggle(cls); p2.classList.toggle(cls);
-            });
-        }
+// ✨ 3. 现在的打开动画，0延迟！不需要等待网络！ ✨
+function openApp() {
+    const home = document.getElementById('screen-home');
+    const app = document.getElementById('injected-app'); // 这是 settings.html 里的那个外壳
+    
+    // 同步一下名字
+    const name = localStorage.getItem('app-title') || 'ZeroPhone';
+    if(document.getElementById('display-name')) document.getElementById('display-name').innerText = name;
 
-        // ✨ 伪装成 SPA 的神仙打开动画 ✨
-        function openApp(url) {
-            const screen = document.getElementById('phone-screen');
-            // 主页像 iOS 一样往深处缩小并变暗
-            screen.style.transform = 'scale(0.95)';
-            screen.style.opacity = '0.3';
-            // 等待动画做完，再跳转文件！
-            setTimeout(() => { window.location.href = url; }, 300);
-        }
+    // 瞬间触发丝滑滑动，绝不卡顿！
+    home.style.transform = 'translateX(-20%) scale(0.95)';
+    home.style.opacity = '0.5';
+    if(app) app.style.transform = 'translateX(0)';
+}
 
-        if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(()=>{}); }); }
+// ✨ 4. 丝滑退出 ✨
+function closeApp() {
+    const home = document.getElementById('screen-home');
+    const app = document.getElementById('injected-app');
+    
+    home.style.transform = 'translateX(0) scale(1)';
+    home.style.opacity = '1';
+    if(app) app.style.transform = 'translateX(100%)';
+}
+
+// 5. 拍立得逻辑 (保持不变)
+function handlePhotoClick(e, img, inp) { e.stopPropagation(); const u = prompt("URL:"); if(u){ document.getElementById(img).src = u; localStorage.setItem(img, u);} else document.getElementById(inp).click(); }
+function handleFileUpload(e, img) { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = e => { const i = new Image(); i.onload = () => { const c = document.createElement('canvas'); let w = i.width, h = i.height; if(w>600){h=Math.round(h*600/w);w=600;} c.width=w; c.height=h; c.getContext('2d').drawImage(i,0,0,w,h); const b = c.toDataURL('image/jpeg',0.8); document.getElementById(img).src = b; try{localStorage.setItem(img,b);}catch(err){} }; i.src = e.target.result; }; r.readAsDataURL(f); }
+function swapPolaroids() { const p1=document.getElementById('polaroid-1'), p2=document.getElementById('polaroid-2'); ['-rotate-6','rotate-6','left-2','right-2','top-2','top-6','z-0','z-10','shadow-md','shadow-lg'].forEach(c=>{p1.classList.toggle(c);p2.classList.toggle(c);}); }
     </script>
 </body>
 </html>
