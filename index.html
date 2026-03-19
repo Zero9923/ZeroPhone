@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ZeroPhone</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'SimSun', 'Songti SC', 'STSong', serif; }
+        input:focus, textarea:focus { outline: 1px dashed #d4d4d8; outline-offset: -1px; border-radius: 4px; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        * { -webkit-tap-highlight-color: transparent; }
+        
+        select { 
+            appearance: none; 
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='square' stroke-linejoin='miter'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); 
+            background-repeat: no-repeat; background-position: right 0 center; background-size: 1.2em; 
+        }
+        ::selection { background: #000; color: #fff; }
+
+        .font-modern { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+        .font-modern input:focus, .font-modern textarea:focus { outline: none; }
+        .font-modern ::selection { background: #18181b; color: #fff; }
+
+        .typing-dot { animation: typing 1.4s infinite ease-in-out both; }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+    </style>
+</head>
+<body class="bg-zinc-900 min-h-screen flex items-center justify-center overflow-hidden m-0 p-0 relative">
+    
+    <div class="w-full h-[100dvh] max-w-[430px] sm:w-[390px] sm:h-[844px] bg-white sm:rounded-[3rem] relative overflow-hidden box-border border-0 sm:border-[8px] sm:border-black shadow-2xl">
+
+        <!-- ========================================================= -->
+        <!--   -->
+        <!-- ========================================================= -->
+        <div id="screen-home" class="absolute inset-0 bg-zinc-50 flex flex-col p-6 transition-transform duration-[400ms] ease-[cubic-bezier(0.32,0.72,0,1)] w-full h-full z-10 translate-x-0">
+            <div class="bg-white border border-zinc-200 rounded-[24px] p-5 grid grid-cols-2 gap-5 shadow-sm min-h-[180px] box-border w-full">
+                <div class="flex flex-col h-full min-w-0 justify-between">
+                    <div>
+                        <input id="app-title" onchange="saveText('app-title')" value="ZeroPhone" class="text-base font-extrabold text-black bg-transparent w-full mb-0 truncate outline-none tracking-widest" />
+                        <input id="app-subtitle" onchange="saveText('app-subtitle')" value="Your Personal AI Assistant" class="text-[9px] text-zinc-500 bg-transparent w-full mb-2 truncate outline-none" />
+                    </div>
+                    <div class="bg-zinc-50 border border-zinc-100 rounded-[12px] p-2 flex-1 flex flex-col justify-center min-h-0">
+                        <div id="calendar-container" class="grid grid-cols-7 gap-y-[2px] w-full mt-0.5"></div>
+                    </div>
+                </div>
+                <div class="flex flex-col h-full relative min-w-0 justify-between">
+                    <div class="absolute -top-1 right-0 text-lg font-light text-black">24°C</div>
+                    <textarea id="app-greeting" onchange="saveText('app-greeting')" class="mt-6 text-[10px] text-center text-zinc-600 bg-transparent resize-none no-scrollbar outline-none w-full leading-snug font-bold" rows="2">Good Morning!&#10;Ready to explore?</textarea>
+                    <div class="flex flex-col gap-1.5 w-full">
+                        <div class="bg-zinc-50 border border-zinc-100 rounded-[10px] py-1.5 px-2 flex flex-col items-center justify-center text-[9px] font-bold text-black text-center w-full leading-tight min-h-[38px]"><span>Today is Wednesday,</span><span>March 18, 2026</span></div>
+                        <div class="bg-zinc-50 border border-zinc-100 rounded-[10px] py-1.5 px-2 flex items-center justify-center text-[9.5px] font-bold text-black text-center w-full leading-tight min-h-[38px]">The sun will set at 3:34 PM</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-10 flex gap-4 h-40 relative">
+                <div class="w-1/2 relative flex items-center justify-center">
+                    <input type="file" accept="image/*" id="fileInput1" class="hidden" onchange="handleFileUpload(event, 'photo1')" />
+                    <input type="file" accept="image/*" id="fileInput2" class="hidden" onchange="handleFileUpload(event, 'photo2')" />
+                    <div id="polaroid-1" onclick="swapPolaroids()" class="absolute bg-white p-2 pb-8 rounded-sm shadow-md transform -rotate-6 transition-all duration-300 hover:scale-105 cursor-pointer w-28 h-32 left-2 top-2 border border-zinc-200 z-0">
+                        <img id="photo1" onclick="handlePhotoClick(event, 'photo1', 'fileInput1')" src="https://images.unsplash.com/photo-1707343843437-caacff5cfa74?q=80&w=200&auto=format&fit=crop" class="w-full h-full object-cover bg-zinc-100 hover:opacity-80 transition-opacity" />
+                    </div>
+                    <div id="polaroid-2" onclick="swapPolaroids()" class="absolute bg-white p-2 pb-8 rounded-sm shadow-lg transform rotate-6 transition-all duration-300 hover:scale-105 cursor-pointer w-28 h-32 right-2 top-6 border border-zinc-200 z-10">
+                        <img id="photo2" onclick="handlePhotoClick(event, 'photo2', 'fileInput2')" src="https://images.unsplash.com/photo-1682687982501-1e58b814714c?q=80&w=200&auto=format&fit=crop" class="w-full h-full object-cover bg-zinc-100 hover:opacity-80 transition-opacity" />
+                    </div>
+                </div>
+
+                <div class="w-1/2 grid grid-cols-2 grid-rows-2 gap-3">
+                    <div onclick="openApp('screen-chat')" class="flex flex-col items-center justify-center gap-1 cursor-pointer active:scale-95 transition-transform">
+                        <div class="w-12 h-12 bg-white border border-zinc-200 rounded-[14px] shadow-sm flex items-center justify-center text-black"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg></div><span class="text-[10px] font-bold text-zinc-600">Lingo</span>
+                    </div>
+                    <div class="flex flex-col items-center justify-center gap-1">
+                        <div class="w-12 h-12 bg-white border border-zinc-200 rounded-[14px] shadow-sm flex items-center justify-center text-black"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg></div><span class="text-[10px] font-bold text-zinc-600">World</span>
+                    </div>
+                    <div onclick="openApp('screen-api')" class="flex flex-col items-center justify-center gap-1 cursor-pointer active:scale-95 transition-transform">
+                        <div class="w-12 h-12 bg-white border border-zinc-200 rounded-[14px] shadow-sm flex items-center justify-center text-black"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" /></svg></div><span class="text-[10px] font-bold text-zinc-600">API</span>
+                    </div>
+                    <div class="flex flex-col items-center justify-center gap-1">
+                        <div class="w-12 h-12 bg-white border border-zinc-200 rounded-[14px] shadow-sm flex items-center justify-center text-black"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" /></svg></div><span class="text-[10px] font-bold text-zinc-600">Face</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="absolute bottom-8 left-6 right-6 h-[72px] bg-white/70 backdrop-blur-xl rounded-[2rem] flex items-center justify-between px-6 shadow-sm border border-white/50">
+                <div class="w-12 h-12 bg-white rounded-[14px] shadow-sm flex items-center justify-center text-black border border-zinc-100"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg></div>
+                <div class="w-12 h-12 bg-white rounded-[14px] shadow-sm flex items-center justify-center text-black border border-zinc-100"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg></div>
+                <div onclick="openApp('screen-chat')" class="cursor-pointer active:scale-90 transition-transform w-12 h-12 bg-white rounded-[14px] shadow-sm flex items-center justify-center text-black border border-zinc-100"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg></div>
+                <div onclick="openApp('screen-api')" class="cursor-pointer active:scale-90 transition-transform w-12 h-12 bg-white rounded-[14px] shadow-sm flex items-center justify-center text-black border border-zinc-100"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg></div>
+            </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!--  API  -->
+        <!-- ========================================================= -->
+        <div id="screen-api" class="absolute inset-0 bg-[#fcfbf8] flex flex-col transition-transform duration-[400ms] ease-[cubic-bezier(0.32,0.72,0,1)] w-full h-full z-20 translate-x-full">
+            <div class="px-6 pt-14 pb-4 flex items-center justify-between border-b border-black z-10 relative">
+                <div onclick="closeApp('screen-api')" class="flex items-center gap-1 cursor-pointer text-zinc-400 hover:text-black transition-colors active:opacity-50 w-16">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="square" stroke-linejoin="miter" d="M15 19l-7-7 7-7" /></svg>
+                    <span class="text-xs font-bold mt-0.5 tracking-widest uppercase">Back</span>
+                </div>
+                <div onclick="saveGlobalAPI()" id="global-save-btn" class="w-16 text-right text-xs font-bold tracking-[0.2em] text-black cursor-pointer active:opacity-50 transition-all uppercase">Save</div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto no-scrollbar p-8 flex flex-col pb-24">
+                <div class="mb-10 mt-4">
+                    <h1 class="text-4xl font-extrabold text-black tracking-widest leading-none mb-2">API<br/>CONFIG.</h1>
+                    <p class="text-[9px] text-zinc-500 tracking-[0.3em] uppercase font-sans">Neural Network Bridging System</p>
+                </div>
+                <div class="border-t-2 border-black pt-6 pb-8 flex flex-col gap-6">
+                    <div class="relative">
+                        <label class="text-[9px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-1">Base URL / </label>
+                        <input id="api-url" type="text" placeholder="https://api.openai.com" class="w-full bg-transparent border-b border-zinc-300 focus:border-black py-2 text-base text-black transition-colors placeholder-zinc-300 rounded-none outline-none" />
+                    </div>
+                    <div class="relative">
+                        <label class="text-[9px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-1">Secret Key / </label>
+                        <input id="api-key" type="password" placeholder="sk-..." class="w-full bg-transparent border-b border-zinc-300 focus:border-black py-2 text-base text-black transition-colors placeholder-zinc-300 rounded-none tracking-widest outline-none" />
+                    </div>
+                    <button type="button" onclick="fetchModels()" class="mt-2 w-full bg-black text-white py-4 text-[10px] font-bold tracking-[0.3em] uppercase active:bg-zinc-800 transition-colors flex items-center justify-center gap-2 rounded-none">Fetch Models / </button>
+                    <div id="fetch-status" class="text-center text-[10px] text-zinc-400 h-3 tracking-widest transition-colors italic">...</div>
+                </div>
+                <div class="border-t border-zinc-300 pt-6 pb-8">
+                    <div class="relative">
+                        <label class="text-[9px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-1">Select Model / </label>
+                        <select id="model-select" class="w-full bg-transparent border-b border-zinc-300 focus:border-black py-2 text-base text-black transition-colors rounded-none cursor-pointer outline-none"><option value=""></option></select>
+                    </div>
+                </div>
+                <div class="border-t border-zinc-300 pt-6 flex flex-col gap-6">
+                    <div class="flex items-center justify-between"><h2 class="text-sm font-extrabold text-black tracking-widest">SAVED PRESETS.</h2></div>
+                    <button id="create-preset-btn" type="button" onclick="openPresetModal()" class="w-full bg-transparent border border-black text-black py-4 text-[10px] font-bold tracking-[0.2em] uppercase active:bg-zinc-100 transition-colors flex items-center justify-center gap-2 rounded-none">Save as Preset / </button>
+                    <div id="presets-list" class="flex flex-col gap-0 mt-2 border-b border-zinc-200"></div>
+                </div>
+                <div class="flex items-center justify-between mt-12 pt-4 border-t border-black">
+                    <span class="text-[9px] font-bold text-zinc-400 tracking-[0.2em] uppercase">Current Status</span>
+                    <div class="flex items-center gap-2 text-[10px] text-zinc-600">
+                        <span id="global-status-dot" class="w-1.5 h-1.5 rounded-full bg-zinc-300"></span>
+                        <span id="global-status-text" class="tracking-widest"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API  -->
+            <div id="custom-modal" class="absolute inset-0 z-50 flex items-center justify-center bg-[#fcfbf8]/90 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
+                <div id="custom-modal-card" class="bg-white p-8 w-[85%] max-w-[320px] shadow-[0_20px_40px_rgba(0,0,0,0.08)] transform scale-95 transition-transform duration-300 flex flex-col gap-6 border border-black mb-32 rounded-none">
+                    <div class="text-center border-b border-zinc-200 pb-4">
+                        <h3 class="text-lg font-extrabold text-black tracking-widest mb-1 uppercase">Name Preset</h3>
+                        <p class="text-[9px] text-zinc-500 tracking-[0.1em] uppercase"></p>
+                    </div>
+                    <input id="preset-name-input" type="text" placeholder="e.g. GPT-4 Pro" class="w-full bg-transparent border-b border-black py-3 text-center text-base text-black outline-none placeholder-zinc-300 rounded-none tracking-widest" />
+                    <div class="flex flex-col gap-2 mt-2">
+                        <button type="button" ontouchstart="forceSave(event)" onmousedown="forceSave(event)" id="modal-save-btn" class="w-full py-4 bg-black text-white text-[10px] font-bold tracking-[0.3em] uppercase active:bg-zinc-800 transition-colors rounded-none">Confirm / </button>
+                        <button type="button" onclick="closePresetModal()" class="w-full py-3 bg-transparent text-zinc-400 text-[10px] font-bold tracking-[0.2em] uppercase active:text-black transition-colors rounded-none">Cancel / </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!--  Lingo  -->
+        <!-- ========================================================= -->
+        <div id="screen-chat" class="absolute inset-0 bg-[#E5E5EA] flex flex-col transition-transform duration-[400ms] ease-[cubic-bezier(0.32,0.72,0,1)] w-full h-full z-30 translate-x-full font-modern">
+            
+            <div id="page-chat" class="absolute inset-0 flex flex-col z-10 bg-white transition-opacity duration-300 opacity-100 pb-[80px]">
+                <div class="pt-12 pb-2 px-5 flex items-center justify-between z-20 bg-white/90 backdrop-blur-md">
+                    <div class="flex items-center gap-3">
+                        <button onclick="closeApp('screen-chat')" class="w-8 h-8 bg-zinc-100 rounded-full flex items-center justify-center active:scale-90 transition-transform cursor-pointer">
+                            <svg class="w-5 h-5 text-zinc-900 pr-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
+                        </button>
+                        <h1 class="text-2xl font-bold text-zinc-900 tracking-tight">Chats</h1>
+                    </div>
+                    <button onclick="toggleSearch()" class="w-8 h-8 bg-zinc-100 rounded-full flex items-center justify-center active:scale-90 transition-transform cursor-pointer">
+                        <svg class="w-4 h-4 text-zinc-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    </button>
+                </div>
+                <div id="search-container" class="px-5 max-h-0 opacity-0 overflow-hidden transition-all duration-300 ease-in-out">
+                    <div class="flex items-center gap-3 pb-2 pt-1">
+                        <div class="flex-1 bg-zinc-100 rounded-xl px-3 py-2 flex items-center">
+                            <svg class="w-4 h-4 text-zinc-400 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                            <input id="search-input" type="text" placeholder="Search..." class="bg-transparent border-none outline-none text-[13px] w-full font-medium text-zinc-900" oninput="handleSearch(this.value)" />
+                        </div>
+                        <button onclick="toggleSearch()" class="text-[13px] font-semibold text-zinc-500 active:text-zinc-900 transition-colors">Cancel</button>
+                    </div>
+                </div>
+                <div class="px-5 py-2 flex items-start gap-4 overflow-x-auto no-scrollbar border-b border-zinc-100 min-h-[80px] transition-all duration-300" id="top-avatars-container">
+                    <div class="text-xs text-zinc-400 font-medium py-3 italic w-full text-center" id="empty-avatar-text"> Create </div>
+                </div>
+                <div class="flex-1 overflow-y-auto no-scrollbar flex flex-col px-3 pt-2" id="chat-list-container"></div>
+            </div>
+
+            <div id="page-discover" class="absolute inset-0 z-0 bg-white opacity-0 pointer-events-none flex flex-col transition-opacity duration-300 pb-[80px]">
+                <div class="pt-12 pb-3 px-5 flex items-center justify-between z-20 bg-white/90 backdrop-blur-md border-b border-zinc-100 sticky top-0">
+                    <h1 class="text-xl font-bold text-zinc-900 tracking-wide">Explore</h1>
+                    <button class="w-8 h-8 bg-zinc-900 rounded-full flex items-center justify-center text-white shadow-md"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg></button>
+                </div>
+                <div class="flex-1 overflow-y-auto no-scrollbar p-4 flex flex-col gap-4">
+                    <div class="bg-zinc-50 rounded-3xl p-5 shadow-[0_2px_10px_rgb(0,0,0,0.02)] border border-zinc-100"><p class="text-[13px] leading-relaxed text-zinc-600 font-medium">No updates yet.</p></div>
+                </div>
+            </div>
+
+            <div id="page-create" class="absolute inset-0 z-0 bg-white opacity-0 pointer-events-none flex flex-col transition-opacity duration-300 pb-[80px]">
+                <div class="pt-12 pb-3 px-5 flex items-center justify-between z-20 bg-white/90 backdrop-blur-md border-b border-zinc-100">
+                    <h1 class="text-xl font-bold text-zinc-900 tracking-wide">Characters</h1>
+                    <button onclick="toggleCreateForm(true)" class="w-8 h-8 bg-zinc-900 rounded-full flex items-center justify-center text-white active:scale-95 transition-transform shadow-md"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg></button>
+                </div>
+                <div class="flex-1 overflow-y-auto no-scrollbar p-5 grid grid-cols-2 gap-3 content-start" id="character-grid"></div>
+            </div>
+
+            <div id="page-me" class="absolute inset-0 z-0 bg-white opacity-0 pointer-events-none flex flex-col items-center justify-center transition-opacity duration-300 pb-[80px]">
+                <div class="w-20 h-20 rounded-full bg-zinc-100 flex items-center justify-center mb-4 shadow-inner">
+                    <svg class="w-8 h-8 text-zinc-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                </div>
+                <h2 class="text-[15px] font-bold text-zinc-900">User Profile</h2>
+                <p class="text-xs text-zinc-400 mt-1 font-medium">Lingo Network</p>
+            </div>
+
+            <!--  -->
+            <div class="absolute bottom-6 left-1/2 -translate-x-1/2 w-[85%] h-[60px] bg-white/85 backdrop-blur-xl border border-zinc-200/60 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.08)] flex items-center justify-around px-2 z-40">
+                <div onclick="switchChatTab('chat')" id="tab-chat" class="flex flex-col items-center justify-center gap-0.5 w-1/4 h-full cursor-pointer text-black transition-all group"><svg class="w-5 h-5 group-active:scale-90 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg><span class="text-[9px] font-semibold tracking-wide">Chats</span></div>
+                <div onclick="switchChatTab('discover')" id="tab-discover" class="flex flex-col items-center justify-center gap-0.5 w-1/4 h-full cursor-pointer text-zinc-400 hover:text-zinc-900 transition-all group"><svg class="w-5 h-5 group-active:scale-90 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span class="text-[9px] font-semibold tracking-wide">Explore</span></div>
+                <div onclick="switchChatTab('create')" id="tab-create" class="flex flex-col items-center justify-center gap-0.5 w-1/4 h-full cursor-pointer text-zinc-400 hover:text-zinc-900 transition-all group"><svg class="w-5 h-5 group-active:scale-90 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg><span class="text-[9px] font-semibold tracking-wide">Create</span></div>
+                <div onclick="switchChatTab('me')" id="tab-me" class="flex flex-col items-center justify-center gap-0.5 w-1/4 h-full cursor-pointer text-zinc-400 hover:text-zinc-900 transition-all group"><svg class="w-5 h-5 group-active:scale-90 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg><span class="text-[9px] font-semibold tracking-wide">Me</span></div>
+            </div>
+
+            <!--  -->
+            <div id="modal-create-form" class="absolute inset-0 z-[60] bg-white translate-y-full transition-transform duration-300 flex flex-col">
+                <div class="pt-12 pb-3 px-5 flex items-center justify-between border-b border-zinc-100">
+                    <button onclick="toggleCreateForm(false)" class="text-zinc-500 font-medium text-sm">Cancel</button>
+                    <h2 id="modal-form-title" class="text-base font-bold text-zinc-900">New Entity</h2>
+                    <div class="w-10"></div> 
+                </div>
+                <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-5 pb-20">
+                    <div class="flex flex-col items-center justify-center pt-1 pb-2">
+                        <div class="relative cursor-pointer group active:scale-95 transition-transform" onclick="document.getElementById('avatar-upload').click()">
+                            <div class="w-24 h-24 rounded-full bg-zinc-50 border border-zinc-200 flex flex-col items-center justify-center text-zinc-300 overflow-hidden shadow-sm">
+                                <img id="avatar-preview" src="" class="w-full h-full object-cover hidden" />
+                                <svg id="avatar-icon" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                            </div>
+                            <div class="absolute bottom-0 right-0 w-7 h-7 bg-zinc-900 rounded-full border-[3px] border-white flex items-center justify-center text-white shadow-md"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg></div>
+                        </div>
+                        <span class="text-[11px] font-medium text-zinc-400 mt-3">Upload Avatar</span>
+                        <input type="file" id="avatar-upload" accept="image/*" class="hidden" onchange="handleAvatarUpload(event)">
+                    </div>
+                    <div class="relative"><label class="text-[11px] font-semibold text-zinc-500 uppercase block mb-1.5">Codename</label><input id="input-name" type="text" class="w-full bg-zinc-50 border-none px-4 py-3 text-[13px] rounded-xl outline-none" /></div>
+                    <div class="flex gap-4">
+                        <div class="flex-1 relative"><label class="text-[11px] font-semibold text-zinc-500 uppercase block mb-1.5">Gender</label><input id="input-gender" type="text" class="w-full bg-zinc-50 border-none px-4 py-3 text-[13px] rounded-xl outline-none" /></div>
+                        <div class="flex-1 relative"><label class="text-[11px] font-semibold text-zinc-500 uppercase block mb-1.5">Age</label><input id="input-age" type="number" class="w-full bg-zinc-50 border-none px-4 py-3 text-[13px] rounded-xl outline-none" /></div>
+                    </div>
+                    <div class="relative"><label class="text-[11px] font-semibold text-zinc-500 uppercase block mb-1.5">Directives</label><textarea id="input-prompt" class="w-full bg-zinc-50 border-none px-4 py-3 text-[13px] rounded-xl min-h-[100px] resize-none outline-none"></textarea></div>
+                    <button onclick="saveCharacter()" class="mt-2 w-full bg-zinc-900 text-white py-3.5 text-[13px] font-semibold active:scale-95 transition-all rounded-xl shadow-lg">Save Entity</button>
+                </div>
+            </div>
+
+            <!--  -->
+            <div id="page-chat-room" class="absolute inset-0 z-[70] bg-[#F2F2F7] translate-x-full transition-transform duration-300 flex flex-col">
+                <div class="pt-12 pb-3 px-4 flex items-center justify-between bg-white/90 backdrop-blur-md border-b border-zinc-200 z-10 shadow-sm">
+                    <button onclick="closeChatRoom()" class="flex items-center text-zinc-900 active:opacity-50">
+                        <svg class="w-5 h-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
+                        <span class="font-medium text-[15px]">Back</span>
+                    </button>
+                    <div class="flex flex-col items-center justify-center absolute left-1/2 -translate-x-1/2">
+                        <span id="chat-room-name" class="font-semibold text-[15px] text-zinc-900">Name</span>
+                    </div>
+                    <div class="w-12"></div>
+                </div>
+                
+                <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-1 pb-6" id="chat-messages" onmousedown="document.getElementById('chat-input').blur()" ontouchstart="document.getElementById('chat-input').blur()"></div>
+                
+                <div class="bg-white border-t border-zinc-100 px-3 py-3 pb-8 flex items-end gap-2 z-10">
+                    <button class="w-9 h-10 flex items-center justify-center text-zinc-400 hover:text-zinc-900 transition-colors flex-shrink-0">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                    </button>
+                    <div class="flex-1 bg-zinc-100 rounded-2xl px-4 py-2 min-h-[40px] flex items-center">
+                        <input id="chat-input" type="text" placeholder="Message..." class="w-full bg-transparent border-none text-[13px] outline-none font-medium text-zinc-900" onkeypress="handleEnter(event)" />
+                    </div>
+                    <button onclick="receiveMessage()" class="w-10 h-10 bg-zinc-100 rounded-full flex items-center justify-center text-zinc-900 active:scale-90 transition-transform flex-shrink-0" title="Generate Reply">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" /></svg>
+                    </button>
+                    <button onclick="sendMessage()" class="w-10 h-10 bg-zinc-900 rounded-full flex items-center justify-center text-white active:scale-90 transition-transform flex-shrink-0" title="Send Message">
+                        <svg class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!--    -->
+            <div id="delete-modal" class="absolute inset-0 z-[80] flex items-center justify-center bg-zinc-900/40 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 font-modern">
+                <div id="delete-modal-card" class="bg-white p-6 w-[80%] max-w-[300px] shadow-[0_20px_60px_rgba(0,0,0,0.15)] transform scale-95 transition-transform duration-300 flex flex-col gap-5 rounded-3xl">
+                    <div class="text-center mt-2">
+                        <h3 id="delete-modal-title" class="text-lg font-bold text-zinc-900 tracking-tight">Delete?</h3>
+                        <p id="delete-modal-desc" class="text-[13px] text-zinc-500 mt-1 leading-snug">This action cannot be undone.</p>
+                    </div>
+                    <div class="flex flex-col gap-2 mt-2">
+                        <button onclick="executeDelete()" class="w-full py-3.5 bg-red-500 text-white text-[14px] font-bold active:scale-95 transition-transform rounded-xl shadow-sm">Delete</button>
+                        <button onclick="closeDeleteModal()" class="w-full py-3.5 bg-zinc-100 text-zinc-600 text-[14px] font-bold active:scale-95 transition-transform rounded-xl">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!--  -->
+    <script>
+        const memoryStorage = {};
+        function safeSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { memoryStorage[k] = v; } }
+        function safeGet(k) { try { return localStorage.getItem(k); } catch (e) { return memoryStorage[k] || null; } }
+
+        function openApp(screenId) {
+            document.getElementById('screen-home').style.transform = 'translateX(-20%) scale(0.95)';
+            document.getElementById('screen-home').style.opacity = '0.5';
+            document.getElementById(screenId).style.transform = 'translateX(0)';
+        }
+        function closeApp(screenId) {
+            document.getElementById('screen-home').style.transform = 'translateX(0) scale(1)';
+            document.getElementById('screen-home').style.opacity = '1';
+            document.getElementById(screenId).style.transform = 'translateX(100%)';
+        }
+
+        // ==============================
+        //  
+        // ==============================
+        const cal = document.getElementById('calendar-container');
+        let h = ''; ['S','M','T','W','T','F','S'].forEach(d => h+=`<div class="text-zinc-400 text-center text-[6px] font-bold mb-0.5">${d}</div>`);
+        for(let i=1; i<=31; i++) { 
+            const isToday = i === 18;
+            const textClass = isToday ? 'bg-black text-white rounded-full w-[13px] h-[13px] font-bold flex items-center justify-center text-[7px] shadow-sm' : 'text-zinc-600 flex items-center justify-center text-[7px] font-bold';
+            h+=`<div class="flex items-center justify-center h-full"><span class="${textClass}">${i}</span></div>`; 
+        }
+        cal.innerHTML = h;
+
+        function saveText(id) { safeSet(id, document.getElementById(id).value); }
+        function handlePhotoClick(e, img, inp) { e.stopPropagation(); const u = prompt("URL:"); if(u){ document.getElementById(img).src = u; safeSet(img, u);} else document.getElementById(inp).click(); }
+        function handleFileUpload(e, img) { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = e => { const i = new Image(); i.onload = () => { const c = document.createElement('canvas'); let w=i.width, h=i.height; if(w>600){h=Math.round(h*600/w);w=600;} c.width=w; c.height=h; c.getContext('2d').drawImage(i,0,0,w,h); const b=c.toDataURL('image/jpeg',0.8); document.getElementById(img).src=b; try{safeSet(img,b);}catch(err){} }; i.src = e.target.result; }; r.readAsDataURL(f); }
+        function swapPolaroids() { const p1=document.getElementById('polaroid-1'), p2=document.getElementById('polaroid-2'); ['-rotate-6','rotate-6','left-2','right-2','top-2','top-6','z-0','z-10','shadow-md','shadow-lg'].forEach(c=>{p1.classList.toggle(c);p2.classList.toggle(c);}); }
+
+        // ==============================
+        //  API
+        // ==============================
+        const urlInput = document.getElementById('api-url'); const keyInput = document.getElementById('api-key'); const modelSelect = document.getElementById('model-select');
+        const statusText = document.getElementById('fetch-status'); const presetsList = document.getElementById('presets-list'); const saveBtn = document.getElementById('global-save-btn');
+        const modal = document.getElementById('custom-modal'); const modalCard = document.getElementById('custom-modal-card'); const nameInput = document.getElementById('preset-name-input');
+
+        nameInput.addEventListener('keypress', function (e) { if (e.key === 'Enter') { e.preventDefault(); confirmSavePreset(); } });
+
+        function saveGlobalAPI() {
+            const url = urlInput.value.trim() || 'https://api.openai.com', key = keyInput.value.trim(), model = modelSelect.value;
+            if(!key || !model) { saveBtn.innerText = 'ERROR'; saveBtn.classList.add('text-red-500'); setTimeout(() => { saveBtn.innerText = 'SAVE'; saveBtn.classList.remove('text-red-500'); }, 1500); return; }
+            safeSet('global_api_url', url); safeSet('global_api_key', key); safeSet('global_api_model', model);
+            updateGlobalStatus(model);
+            saveBtn.innerText = 'SAVED'; saveBtn.classList.add('text-green-600'); setTimeout(() => { saveBtn.innerText = 'SAVE'; saveBtn.classList.remove('text-green-600'); }, 1500);
+        }
+        function updateGlobalStatus(modelName) {
+            document.getElementById('global-status-text').innerText = modelName;
+            document.getElementById('global-status-dot').classList.replace('bg-zinc-300', 'bg-black');
+            document.getElementById('global-status-dot').classList.add('animate-pulse');
+        }
+        async function fetchModels() {
+            let url = urlInput.value.trim() || "https://api.openai.com"; url = url.replace(/\/+$/, ''); const key = keyInput.value.trim();
+            if(!key) { showStatus('Missing Secret Key.', 'text-red-500'); return; }
+            showStatus('Connecting...', 'text-zinc-400');
+            try {
+                const response = await fetch(`${url}/v1/models`, { method: 'GET', headers: { 'Authorization': `Bearer ${key}` } });
+                if(!response.ok) throw new Error('Key');
+                const data = await response.json(); modelSelect.innerHTML = '';
+                if(data.data && data.data.length > 0) { data.data.forEach(m => { const opt = document.createElement('option'); opt.value = m.id; opt.textContent = m.id; modelSelect.appendChild(opt); }); showStatus(`${data.data.length} Models Fetched.`, 'text-black font-bold'); } 
+                else throw new Error('');
+            } catch(err) {
+                showStatus('Network blocked. Mock models loaded.', 'text-zinc-600');
+                const mockModels = ['gpt-3.5-turbo', 'gpt-4', 'gpt-4o', 'claude-3-opus', 'gemini-1.5-pro', 'deepseek-chat'];
+                modelSelect.innerHTML = ''; mockModels.forEach(m => { const opt = document.createElement('option'); opt.value = m; opt.textContent = m; modelSelect.appendChild(opt); });
+            }
+        }
+        function showStatus(t, c) { statusText.innerText = t; statusText.className = `text-center text-[10px] h-3 tracking-widest transition-colors italic ${c}`; }
+        function getPresets() { return JSON.parse(safeGet('api_presets') || '[]'); }
+        function openPresetModal() {
+            const key = keyInput.value.trim(), model = modelSelect.value;
+            if(!key || !model) { const b = document.getElementById('create-preset-btn'), o = b.innerHTML; b.innerHTML = ` MISSING PARAMETERS`; b.classList.add('text-red-500', 'border-red-500'); setTimeout(() => { b.innerHTML = o; b.classList.remove('text-red-500', 'border-red-500'); }, 2000); return; }
+            nameInput.value = ''; modal.classList.remove('opacity-0', 'pointer-events-none'); modalCard.classList.remove('scale-95'); modalCard.classList.add('scale-100'); setTimeout(() => nameInput.focus(), 100);
+        }
+        function closePresetModal() { nameInput.blur(); modal.classList.add('opacity-0', 'pointer-events-none'); modalCard.classList.remove('scale-100'); modalCard.classList.add('scale-95'); }
+        function forceSave(e) { if(e) e.preventDefault(); confirmSavePreset(); }
+        function confirmSavePreset() {
+            const presetName = nameInput.value.trim(); if(!presetName) { nameInput.classList.add('border-red-500', 'placeholder-red-300'); setTimeout(() => nameInput.classList.remove('border-red-500', 'placeholder-red-300'), 1000); return; }
+            const btn = document.getElementById('modal-save-btn'); btn.innerText = 'SAVING...';
+            setTimeout(() => {
+                const url = urlInput.value.trim() || 'https://api.openai.com', key = keyInput.value.trim(), model = modelSelect.value;
+                const newPreset = { id: Date.now().toString(), name: presetName, url: url, key: key, model: model };
+                const presets = getPresets(); presets.push(newPreset); safeSet('api_presets', JSON.stringify(presets));
+                renderPresets(); closePresetModal(); btn.innerText = 'Confirm / ';
+            }, 50);
+        }
+        function loadPreset(id) { const presets = getPresets(), target = presets.find(p => p.id === id); if(target) { urlInput.value = target.url; keyInput.value = target.key; modelSelect.innerHTML = `<option value="${target.model}">${target.model}</option>`; showStatus('Preset loaded. Click SAVE above.', 'text-black font-bold'); } }
+        function deletePreset(e, id) { e.stopPropagation(); let presets = getPresets(); presets = presets.filter(p => p.id !== id); safeSet('api_presets', JSON.stringify(presets)); renderPresets(); }
+        function renderPresets() {
+            const presets = getPresets(); presetsList.innerHTML = ''; 
+            if(presets.length === 0) { presetsList.innerHTML = '<div class="text-[10px] text-zinc-400 text-center py-6 tracking-widest uppercase italic">Empty Presets.</div>'; return; }
+            presets.forEach((p, i) => {
+                const card = document.createElement('div'); card.className = "flex items-center justify-between py-4 cursor-pointer hover:bg-zinc-100 transition-colors active:opacity-50 border-t border-zinc-200 group"; card.onclick = () => loadPreset(p.id);
+                card.innerHTML = `<div class="flex flex-col gap-1 overflow-hidden"><span class="text-sm font-bold text-black truncate tracking-wider uppercase">0${i+1}. ${p.name}</span><span class="text-[10px] text-zinc-500 font-sans truncate">${p.model}</span></div><div onclick="deletePreset(event, '${p.id}')" class="p-2 text-zinc-300 hover:text-black transition-colors"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="square" stroke-linejoin="miter" d="M6 18L18 6M6 6l12 12" /></svg></div>`;
+                presetsList.appendChild(card);
+            });
+        }
+
+        // ==============================
+        //  Lingo
+        // ==============================
+        let characters = JSON.parse(safeGet('lingo_chars') || '[]'); 
+        let chats = JSON.parse(safeGet('lingo_chats') || '[]'); 
+        let chatHistories = JSON.parse(safeGet('lingo_histories') || '{}'); 
+
+        let currentChatId = null; let currentUploadedAvatarUrl = null; let editingCharId = null; let isSearchOpen = false;
+        let isReceiving = false; 
+
+        const gradients = ['from-blue-400 to-indigo-500','from-pink-400 to-rose-500','from-amber-400 to-orange-500','from-emerald-400 to-teal-500'];
+
+        function saveAllLingoData() {
+            safeSet('lingo_chars', JSON.stringify(characters));
+            safeSet('lingo_chats', JSON.stringify(chats));
+            safeSet('lingo_histories', JSON.stringify(chatHistories));
+        }
+
+        //   
+        let pressTimer = null;
+        let isLongPressTrigged = false;
+        let deleteTarget = { type: null, id: null };
+
+        function startPress(e, type, id) {
+            isLongPressTrigged = false;
+            pressTimer = setTimeout(() => {
+                isLongPressTrigged = true;
+                showDeleteModal(type, id);
+            }, 600); //  600ms 
+        }
+
+        function cancelPress() {
+            if(pressTimer) clearTimeout(pressTimer);
+        }
+
+        function showDeleteModal(type, id) {
+            deleteTarget = { type, id };
+            const title = document.getElementById('delete-modal-title');
+            const desc = document.getElementById('delete-modal-desc');
+            const char = characters.find(c => c.id === id);
+            
+            if(type === 'character') {
+                title.innerText = `Delete ${char.name}?`;
+                desc.innerText = "This will permanently delete the character and all related chat records.";
+            } else if(type === 'chat') {
+                title.innerText = `Clear Chat?`;
+                desc.innerText = `This will clear all messages with ${char.name}. The character will remain.`;
+            }
+            
+            const modal = document.getElementById('delete-modal');
+            const card = document.getElementById('delete-modal-card');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            card.classList.remove('scale-95');
+            card.classList.add('scale-100');
+            // ()
+            if (navigator.vibrate) navigator.vibrate(50);
+        }
+
+        function closeDeleteModal() {
+            const modal = document.getElementById('delete-modal');
+            const card = document.getElementById('delete-modal-card');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            card.classList.remove('scale-100');
+            card.classList.add('scale-95');
+            deleteTarget = { type: null, id: null };
+        }
+
+        function executeDelete() {
+            const { type, id } = deleteTarget;
+            if(!id) return;
+
+            if(type === 'character') {
+                characters = characters.filter(c => c.id !== id);
+                chats = chats.filter(c => c.id !== id);
+                delete chatHistories[id];
+                if(currentChatId === id) currentChatId = null;
+            } else if (type === 'chat') {
+                chats = chats.filter(c => c.id !== id);
+                chatHistories[id] = []; 
+                if(currentChatId === id) document.getElementById('chat-messages').innerHTML = '';
+            }
+
+            saveAllLingoData();
+            renderCharacters();
+            renderTopAvatars();
+            renderChatList();
+            closeDeleteModal();
+        }
+
+        function switchChatTab(tab) {
+            const pages = ['chat', 'discover', 'create', 'me'];
+            pages.forEach(p => {
+                const el = document.getElementById(`page-${p}`); const btn = document.getElementById(`tab-${p}`);
+                if (p === tab) { el.classList.remove('opacity-0', 'z-0', 'pointer-events-none'); el.classList.add('opacity-100', 'z-10'); if(btn) { btn.classList.remove('text-zinc-400'); btn.classList.add('text-black'); } } 
+                else { el.classList.remove('opacity-100', 'z-10'); el.classList.add('opacity-0', 'z-0', 'pointer-events-none'); if(btn) { btn.classList.remove('text-black'); btn.classList.add('text-zinc-400'); } }
+            });
+        }
+
+        function toggleSearch() {
+            isSearchOpen = !isSearchOpen; const container = document.getElementById('search-container'); const input = document.getElementById('search-input'); const avatars = document.getElementById('top-avatars-container');
+            if(isSearchOpen) { container.classList.remove('max-h-0', 'opacity-0'); container.classList.add('max-h-16', 'opacity-100'); avatars.classList.add('opacity-0', 'scale-y-0', 'h-0', 'overflow-hidden'); setTimeout(() => input.focus(), 300); } 
+            else { container.classList.add('max-h-0', 'opacity-0'); container.classList.remove('max-h-16', 'opacity-100'); avatars.classList.remove('opacity-0', 'scale-y-0', 'h-0', 'overflow-hidden'); input.value = ''; handleSearch(''); }
+        }
+        function handleSearch(query) {
+            const q = query.toLowerCase().trim(); const list = document.getElementById('chat-list-container');
+            if (!q) { renderChatList(); return; }
+            const charMatches = characters.filter(c => c.name.toLowerCase().includes(q));
+            if (charMatches.length > 0) { list.innerHTML = `<div class="px-3 pb-2 pt-2 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Characters Found</div>` + charMatches.map(c => renderSearchItem(c, 'Tap to start chatting')).join(''); } 
+            else { const recordMatches = chats.filter(c => c.prompt && c.prompt.toLowerCase().includes(q));
+                if (recordMatches.length > 0) { list.innerHTML = `<div class="px-3 pb-2 pt-2 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Chat Records Found</div>` + recordMatches.map(c => renderSearchItem(c, `Matched keyword in history...`)).join(''); } 
+                else { list.innerHTML = `<div class="text-center text-zinc-400 text-[13px] mt-10 font-medium"> "${query}" </div>`; } }
+        }
+        function renderSearchItem(c, subtext) { return `<div onclick="openChatRoom(${c.id})" class="flex items-center gap-3 px-3 py-3 cursor-pointer hover:bg-zinc-50 rounded-2xl transition-colors">${c.avatarUrl ? `<img src="${c.avatarUrl}" class="w-11 h-11 rounded-full object-cover flex-shrink-0" />` : `<div class="w-11 h-11 rounded-full bg-gradient-to-tr ${c.color} flex items-center justify-center text-white flex-shrink-0"><span class="text-sm font-bold">${c.name.substring(0,1).toUpperCase()}</span></div>`}<div class="flex-1 border-b border-zinc-100 pb-2.5 pt-1.5"><span class="font-semibold text-[15px] text-zinc-900 block">${c.name}</span><p class="text-[13px] text-zinc-400 truncate font-medium italic">${subtext}</p></div></div>`; }
+        
+        function toggleCreateForm(show) {
+            const modal = document.getElementById('modal-create-form');
+            if (show) { editingCharId = null; document.getElementById('modal-form-title').innerText = "New Entity"; document.getElementById('input-name').value = ''; document.getElementById('input-gender').value = ''; document.getElementById('input-age').value = ''; document.getElementById('input-prompt').value = ''; resetAvatarUpload(); modal.classList.remove('translate-y-full'); } 
+            else { modal.classList.add('translate-y-full'); }
+        }
+        function editCharacter(id) {
+            const char = characters.find(c => c.id === id); if (!char) return; editingCharId = id; document.getElementById('modal-form-title').innerText = "Edit Entity"; document.getElementById('input-name').value = char.name || ''; document.getElementById('input-gender').value = char.gender || ''; document.getElementById('input-age').value = char.age || ''; document.getElementById('input-prompt').value = char.prompt || '';
+            if (char.avatarUrl) { currentUploadedAvatarUrl = char.avatarUrl; document.getElementById('avatar-preview').src = currentUploadedAvatarUrl; document.getElementById('avatar-preview').classList.remove('hidden'); document.getElementById('avatar-icon').classList.add('hidden'); } else { resetAvatarUpload(); }
+            document.getElementById('modal-create-form').classList.remove('translate-y-full');
+        }
+        function handleAvatarUpload(event) { const file = event.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = e => { currentUploadedAvatarUrl = e.target.result; document.getElementById('avatar-preview').src = currentUploadedAvatarUrl; document.getElementById('avatar-preview').classList.remove('hidden'); document.getElementById('avatar-icon').classList.add('hidden'); }; reader.readAsDataURL(file); } }
+        function resetAvatarUpload() { currentUploadedAvatarUrl = null; document.getElementById('avatar-preview').src = ''; document.getElementById('avatar-preview').classList.add('hidden'); document.getElementById('avatar-icon').classList.remove('hidden'); document.getElementById('avatar-upload').value = ''; }
+        
+        function saveCharacter() {
+            const name = document.getElementById('input-name').value || 'Unknown'; const gender = document.getElementById('input-gender').value; const age = document.getElementById('input-age').value; const prompt = document.getElementById('input-prompt').value;
+            if (editingCharId) { const char = characters.find(c => c.id === editingCharId); if (char) { char.name = name; char.gender = gender; char.age = age; char.prompt = prompt; char.avatarUrl = currentUploadedAvatarUrl; } } 
+            else { const color = gradients[characters.length % gradients.length]; const newChar = { id: Date.now(), name, gender, age, prompt, color, avatarUrl: currentUploadedAvatarUrl }; characters.push(newChar); chatHistories[newChar.id] = []; }
+            saveAllLingoData(); document.getElementById('modal-create-form').classList.add('translate-y-full'); renderCharacters(); renderTopAvatars(); renderChatList(); if (!editingCharId) switchChatTab('chat');
+        }
+
+        //   
+        function renderCharacters() {
+            const grid = document.getElementById('character-grid'); if(characters.length === 0) { grid.innerHTML = `<div class="col-span-2 text-center text-zinc-400 text-[13px] mt-10 font-medium"> + </div>`; return; }
+            grid.innerHTML = characters.map(c => `
+            <div 
+                onmousedown="startPress(event, 'character', ${c.id})" onmouseup="cancelPress()" onmouseleave="cancelPress()"
+                ontouchstart="startPress(event, 'character', ${c.id})" ontouchend="cancelPress()" ontouchmove="cancelPress()"
+                onclick="if(!isLongPressTrigged) editCharacter(${c.id})" 
+                style="-webkit-touch-callout: none; user-select: none;"
+                class="bg-zinc-50 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 border border-zinc-100 shadow-sm cursor-pointer active:scale-95 transition-transform">
+                ${c.avatarUrl ? `<img src="${c.avatarUrl}" class="w-14 h-14 rounded-full object-cover ring-2 ring-white pointer-events-none" />` : `<div class="w-14 h-14 rounded-full bg-gradient-to-tr ${c.color} flex items-center justify-center text-white ring-2 ring-white pointer-events-none"><span class="text-base font-bold">${c.name.substring(0,1).toUpperCase()}</span></div>`}
+                <div class="flex flex-col items-center w-full pointer-events-none">
+                    <span class="text-[13px] font-semibold text-zinc-800 truncate w-full text-center">${c.name}</span>
+                    ${(c.gender || c.age) ? `<span class="text-[10px] text-zinc-400 font-medium">${c.gender || '??'} • ${c.age || '??'}</span>` : ''}
+                </div>
+            </div>`).join('');
+        }
+        
+        function renderTopAvatars() {
+            const container = document.getElementById('top-avatars-container');
+            if (characters.length > 0) { 
+                container.innerHTML = characters.map(c => `<div onclick="openChatRoom(${c.id})" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform flex-shrink-0">${c.avatarUrl ? `<img src="${c.avatarUrl}" class="w-12 h-12 rounded-full object-cover ring-2 ring-transparent hover:ring-zinc-200 transition-all" />` : `<div class="w-12 h-12 rounded-full bg-gradient-to-tr ${c.color} flex items-center justify-center text-white ring-2 ring-transparent hover:ring-zinc-200 transition-all"><span class="text-sm font-bold">${c.name.substring(0,1).toUpperCase()}</span></div>`}<span class="text-[10px] font-semibold text-zinc-800 w-14 text-center truncate">${c.name}</span></div>`).join(''); 
+            } else {
+                // 
+                container.innerHTML = `<div class="text-xs text-zinc-400 font-medium py-3 italic w-full text-center" id="empty-avatar-text"> Create </div>`;
+            }
+        }
+        
+        //   
+        function renderChatList() {
+            const list = document.getElementById('chat-list-container');
+            list.innerHTML = chats.map(c => { 
+                const history = chatHistories[c.id] || []; const lastMsg = history.length > 0 ? history[history.length-1].text : "Start a conversation..."; 
+                return `
+                <div 
+                    onmousedown="startPress(event, 'chat', ${c.id})" onmouseup="cancelPress()" onmouseleave="cancelPress()"
+                    ontouchstart="startPress(event, 'chat', ${c.id})" ontouchend="cancelPress()" ontouchmove="cancelPress()"
+                    onclick="if(!isLongPressTrigged) openChatRoom(${c.id})"
+                    style="-webkit-touch-callout: none; user-select: none;"
+                    class="flex items-center gap-3 px-3 py-3 cursor-pointer hover:bg-zinc-50 rounded-2xl transition-colors">
+                    ${c.avatarUrl ? `<img src="${c.avatarUrl}" class="w-11 h-11 rounded-full object-cover flex-shrink-0 pointer-events-none" />` : `<div class="w-11 h-11 rounded-full bg-gradient-to-tr ${c.color} flex items-center justify-center text-white flex-shrink-0 pointer-events-none"><span class="text-sm font-bold">${c.name.substring(0,1).toUpperCase()}</span></div>`}
+                    <div class="flex-1 overflow-hidden border-b border-zinc-100 pb-2.5 pt-1.5 pointer-events-none">
+                        <div class="flex justify-between items-center mb-0.5"><span class="font-semibold text-[15px] text-zinc-900">${c.name}</span></div>
+                        <p class="text-[13px] text-zinc-400 truncate font-medium">${lastMsg}</p>
+                    </div>
+                </div>`; 
+            }).join('');
+        }
+        
+        function openChatRoom(charId) { currentChatId = charId; const char = characters.find(c => c.id === charId); document.getElementById('chat-room-name').innerText = char.name; document.getElementById('page-chat-room').classList.remove('translate-x-full'); renderChatMessages(); }
+        function closeChatRoom() { document.getElementById('page-chat-room').classList.add('translate-x-full'); if (!chats.find(c => c.id === currentChatId)) { chats.push(characters.find(c => c.id === currentChatId)); saveAllLingoData(); } renderChatList(); }
+        
+        function renderChatMessages() {
+            const container = document.getElementById('chat-messages'); 
+            const history = chatHistories[currentChatId] || [];
+            const char = characters.find(c => c.id === currentChatId);
+            
+            if (!char) return;
+
+            const charAvatarHTML = char.avatarUrl 
+                ? `<img src="${char.avatarUrl}" class="w-8 h-8 rounded-full object-cover flex-shrink-0 shadow-sm" />` 
+                : `<div class="w-8 h-8 rounded-full bg-gradient-to-tr ${char.color} flex items-center justify-center text-white flex-shrink-0 shadow-sm text-xs font-bold">${char.name.charAt(0).toUpperCase()}</div>`;
+                
+            const userAvatarHTML = `<div class="w-8 h-8 rounded-full bg-zinc-200 border border-zinc-300 flex items-center justify-center text-zinc-500 flex-shrink-0 shadow-sm"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>`;
+
+            container.innerHTML = history.map((msg, idx) => {
+                const isNextSame = idx < history.length - 1 && history[idx + 1].role === msg.role;
+                const isPrevSame = idx > 0 && history[idx - 1].role === msg.role;
+
+                const renderAiAvatar = (!isNextSame && msg.role === 'ai' || msg.role === 'error') ? charAvatarHTML : `<div class="w-8 h-8 flex-shrink-0"></div>`;
+                const renderUserAvatar = (!isNextSame && msg.role === 'user') ? userAvatarHTML : `<div class="w-8 h-8 flex-shrink-0"></div>`;
+
+                let aiRounding = "rounded-2xl"; if (isPrevSame) aiRounding += " rounded-tl-sm"; if (isNextSame) aiRounding += " rounded-bl-sm";
+                let userRounding = "rounded-2xl"; if (isPrevSame) userRounding += " rounded-tr-sm"; if (isNextSame) userRounding += " rounded-br-sm";
+
+                const mtClass = isPrevSame ? "mt-0.5" : "mt-4";
+
+                if (msg.role === 'user') {
+                    return `<div class="flex justify-end gap-2 w-full ${mtClass} items-end"><div class="bg-zinc-900 px-3.5 py-2 ${userRounding} shadow-sm max-w-[75%]"><p class="text-[14px] text-white font-medium break-words leading-snug whitespace-pre-wrap">${msg.text}</p></div>${renderUserAvatar}</div>`;
+                } else if (msg.role === 'error') {
+                    return `<div class="flex justify-start gap-2 w-full mt-4 items-end">${renderAiAvatar}<div class="bg-red-50 px-3.5 py-2 rounded-2xl rounded-bl-sm shadow-sm border border-red-100 max-w-[75%]"><p class="text-[14px] text-red-600 font-medium break-words leading-snug whitespace-pre-wrap">${msg.text}</p></div></div>`;
+                } else {
+                    return `<div class="flex justify-start gap-2 w-full ${mtClass} items-end">${renderAiAvatar}<div class="bg-white px-3.5 py-2 ${aiRounding} shadow-sm border border-zinc-100 max-w-[75%]"><p class="text-[14px] text-zinc-800 font-medium break-words leading-snug whitespace-pre-wrap">${msg.text}</p></div></div>`;
+                }
+            }).join('');
+            scrollToBottom();
+        }
+
+        function scrollToBottom() { const container = document.getElementById('chat-messages'); container.scrollTop = container.scrollHeight; }
+        function handleEnter(e) { if (e.key === 'Enter') sendMessage(); }
+        
+        function sendMessage() {
+            const input = document.getElementById('chat-input'); const text = input.value.trim(); if(!text) return;
+            if(!chatHistories[currentChatId]) chatHistories[currentChatId] = [];
+            chatHistories[currentChatId].push({ role: 'user', text }); input.value = ''; 
+            saveAllLingoData(); renderChatMessages();
+        }
+
+        async function receiveMessage() {
+            if(isReceiving || !currentChatId) return;
+            isReceiving = true;
+
+            const container = document.getElementById('chat-messages'); 
+            const typingId = 'typing-' + Date.now();
+            const char = characters.find(c => c.id === currentChatId);
+
+            // 2
+            if(!chatHistories[currentChatId]) chatHistories[currentChatId] = [];
+            const history = chatHistories[currentChatId];
+
+            const charAvatar = char.avatarUrl ? `<img src="${char.avatarUrl}" class="w-8 h-8 rounded-full object-cover flex-shrink-0 shadow-sm" />` : `<div class="w-8 h-8 rounded-full bg-gradient-to-tr ${char.color} flex items-center justify-center text-white flex-shrink-0 shadow-sm text-xs font-bold">${char.name.charAt(0).toUpperCase()}</div>`;
+
+            const isPrevSame = history.length > 0 && history[history.length - 1].role === 'ai';
+            const mtClass = isPrevSame ? "mt-0.5" : "mt-4";
+            
+            // 3 insertAdjacentHTML  innerHTML += 
+            container.insertAdjacentHTML('beforeend', `
+            <div id="${typingId}" class="flex justify-start gap-2 w-full ${mtClass} items-end">
+                ${charAvatar}
+                <div class="bg-white px-3.5 py-2.5 rounded-2xl rounded-bl-sm shadow-sm border border-zinc-100 flex items-center gap-1 w-14 h-[32px]">
+                    <div class="w-1.5 h-1.5 bg-zinc-400 rounded-full typing-dot"></div><div class="w-1.5 h-1.5 bg-zinc-400 rounded-full typing-dot"></div><div class="w-1.5 h-1.5 bg-zinc-400 rounded-full typing-dot"></div>
+                </div>
+            </div>`);
+            scrollToBottom();
+            
+            let apiUrl = safeGet('global_api_url') || "https://api.openai.com"; apiUrl = apiUrl.replace(/\/+$/, '');
+            const apiKey = safeGet('global_api_key');
+            const apiModel = safeGet('global_api_model') || "gpt-3.5-turbo";
+
+            if (!apiKey) {
+                setTimeout(() => {
+                    document.getElementById(typingId)?.remove();
+                    chatHistories[currentChatId].push({ role: 'error', text: " API  Secret Key" });
+                    saveAllLingoData(); renderChatMessages(); isReceiving = false;
+                }, 800); return;
+            }
+
+            const systemPrompt = `${char.name}${char.gender || ''}${char.age || ''}
+
+${char.prompt}
+
+
+1. AI
+2. 
+3. ****\\n
+4. 
+\\n\\n
+3
+5. `;
+
+            const messagesPayload = [{ role: "system", content: systemPrompt }];
+            const recentHistory = history.slice(-15);
+            recentHistory.forEach(msg => {
+                if(msg.role === 'user' || msg.role === 'ai') {
+                    messagesPayload.push({ role: msg.role === 'user' ? 'user' : 'assistant', content: msg.text });
+                }
+            });
+
+            try {
+                const response = await fetch(`${apiUrl}/v1/chat/completions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+                    body: JSON.stringify({ model: apiModel, messages: messagesPayload, temperature: 0.85 })
+                });
+
+                document.getElementById(typingId)?.remove();
+
+                if (!response.ok) {
+                    const errData = await response.json().catch(()=>({}));
+                    throw new Error(errData.error?.message || ` (: ${response.status})`);
+                }
+
+                const data = await response.json();
+                const aiReply = data.choices[0].message.content;
+
+                const replies = aiReply.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+
+                for (let i = 0; i < replies.length; i++) {
+                    if (i > 0) {
+                        const nextTypingId = 'typing-' + Date.now();
+                        const chatBox = document.getElementById('chat-messages');
+                        
+                        // 3 insertAdjacentHTML
+                        chatBox.insertAdjacentHTML('beforeend', `
+                        <div id="${nextTypingId}" class="flex justify-start gap-2 w-full mt-0.5 items-end">
+                            <div class="w-8 h-8 flex-shrink-0"></div>
+                            <div class="bg-white px-3.5 py-2.5 rounded-2xl rounded-tl-sm rounded-bl-sm shadow-sm border border-zinc-100 flex items-center gap-1 w-14 h-[32px]">
+                                <div class="w-1.5 h-1.5 bg-zinc-400 rounded-full typing-dot"></div><div class="w-1.5 h-1.5 bg-zinc-400 rounded-full typing-dot"></div><div class="w-1.5 h-1.5 bg-zinc-400 rounded-full typing-dot"></div>
+                            </div>
+                        </div>`);
+                        scrollToBottom();
+                        
+                        const delay = Math.min(2000, 800 + replies[i].length * 30);
+                        await new Promise(r => setTimeout(r, delay));
+                        document.getElementById(nextTypingId)?.remove();
+                    }
+
+                    chatHistories[currentChatId].push({ role: 'ai', text: replies[i] });
+                    saveAllLingoData(); 
+                    renderChatMessages();
+                }
+
+            } catch (error) {
+                document.getElementById(typingId)?.remove();
+                chatHistories[currentChatId].push({ role: 'error', text: `API ${error.message}` });
+                saveAllLingoData(); renderChatMessages();
+            } finally {
+                isReceiving = false;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            ['app-title', 'app-subtitle', 'app-greeting'].forEach(id => { const s = safeGet(id); if(s !== null) document.getElementById(id).value = s; });
+            ['photo1', 'photo2'].forEach(id => { const s = safeGet(id); if(s) document.getElementById(id).src = s; });
+            
+            const gUrl = safeGet('global_api_url'), gKey = safeGet('global_api_key'), gMod = safeGet('global_api_model');
+            if(gUrl) urlInput.value = gUrl; if(gKey) keyInput.value = gKey;
+            if(gMod) { modelSelect.innerHTML = `<option value="${gMod}">${gMod}</option>`; updateGlobalStatus(gMod); }
+            renderPresets();
+
+            renderCharacters(); renderTopAvatars(); renderChatList();
+        });
+    </script>
+</body>
+</html>
