@@ -40,7 +40,7 @@
     <div class="w-full h-[100dvh] max-w-[430px] sm:w-[390px] sm:h-[844px] bg-white sm:rounded-[3rem] relative overflow-hidden box-border border-0 sm:border-[8px] sm:border-black shadow-2xl">
 
         <!-- ========================================================= -->
-        <!--   -->
+        <!-- 🏠 主屏幕 -->
         <!-- ========================================================= -->
         <div id="screen-home" class="absolute inset-0 bg-zinc-50 flex flex-col p-6 transition-transform duration-[400ms] ease-[cubic-bezier(0.32,0.72,0,1)] w-full h-full z-10 translate-x-0">
             <div class="bg-white border border-zinc-200 rounded-[24px] p-5 grid grid-cols-2 gap-5 shadow-sm min-h-[180px] box-border w-full">
@@ -54,7 +54,7 @@
                     </div>
                 </div>
                 <div class="flex flex-col h-full relative min-w-0 justify-between">
-                    <div class="absolute -top-1 right-0 text-lg font-light text-black">24�C</div>
+                    <div class="absolute -top-1 right-0 text-lg font-light text-black">24°C</div>
                     <textarea id="app-greeting" onchange="saveText('app-greeting')" class="mt-6 text-[10px] text-center text-zinc-600 bg-transparent resize-none no-scrollbar outline-none w-full leading-snug font-bold" rows="2">Good Morning!&#10;Ready to explore?</textarea>
                     <div class="flex flex-col gap-1.5 w-full">
                         <div class="bg-zinc-50 border border-zinc-100 rounded-[10px] py-1.5 px-2 flex flex-col items-center justify-center text-[9px] font-bold text-black text-center w-full leading-tight min-h-[38px]"><span>Today is Wednesday,</span><span>March 18, 2026</span></div>
@@ -100,7 +100,7 @@
         </div>
 
         <!-- ========================================================= -->
-        <!--  API  -->
+        <!-- ⚙️ API 屏幕 -->
         <!-- ========================================================= -->
         <div id="screen-api" class="absolute inset-0 bg-[#fcfbf8] flex flex-col transition-transform duration-[400ms] ease-[cubic-bezier(0.32,0.72,0,1)] w-full h-full z-20 translate-x-full">
             <div class="px-6 pt-14 pb-4 flex items-center justify-between border-b border-black z-10 relative">
@@ -118,54 +118,54 @@
                 </div>
                 <div class="border-t-2 border-black pt-6 pb-8 flex flex-col gap-6">
                     <div class="relative">
-                        <label class="text-[9px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-1">Base URL / </label>
+                        <label class="text-[9px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-1">Base URL / 代理地址</label>
                         <input id="api-url" type="text" placeholder="https://api.openai.com" class="w-full bg-transparent border-b border-zinc-300 focus:border-black py-2 text-base text-black transition-colors placeholder-zinc-300 rounded-none outline-none" />
                     </div>
                     <div class="relative">
-                        <label class="text-[9px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-1">Secret Key / </label>
+                        <label class="text-[9px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-1">Secret Key / 密钥</label>
                         <input id="api-key" type="password" placeholder="sk-..." class="w-full bg-transparent border-b border-zinc-300 focus:border-black py-2 text-base text-black transition-colors placeholder-zinc-300 rounded-none tracking-widest outline-none" />
                     </div>
-                    <button type="button" onclick="fetchModels()" class="mt-2 w-full bg-black text-white py-4 text-[10px] font-bold tracking-[0.3em] uppercase active:bg-zinc-800 transition-colors flex items-center justify-center gap-2 rounded-none">Fetch Models / </button>
-                    <div id="fetch-status" class="text-center text-[10px] text-zinc-400 h-3 tracking-widest transition-colors italic">...</div>
+                    <button type="button" onclick="fetchModels()" class="mt-2 w-full bg-black text-white py-4 text-[10px] font-bold tracking-[0.3em] uppercase active:bg-zinc-800 transition-colors flex items-center justify-center gap-2 rounded-none">Fetch Models / 拉取模型</button>
+                    <div id="fetch-status" class="text-center text-[10px] text-zinc-400 h-3 tracking-widest transition-colors italic">等待连接...</div>
                 </div>
                 <div class="border-t border-zinc-300 pt-6 pb-8">
                     <div class="relative">
-                        <label class="text-[9px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-1">Select Model / </label>
-                        <select id="model-select" class="w-full bg-transparent border-b border-zinc-300 focus:border-black py-2 text-base text-black transition-colors rounded-none cursor-pointer outline-none"><option value=""></option></select>
+                        <label class="text-[9px] font-bold text-zinc-400 uppercase tracking-[0.2em] block mb-1">Select Model / 选择模型</label>
+                        <select id="model-select" class="w-full bg-transparent border-b border-zinc-300 focus:border-black py-2 text-base text-black transition-colors rounded-none cursor-pointer outline-none"><option value="">请先拉取或手动输入</option></select>
                     </div>
                 </div>
                 <div class="border-t border-zinc-300 pt-6 flex flex-col gap-6">
                     <div class="flex items-center justify-between"><h2 class="text-sm font-extrabold text-black tracking-widest">SAVED PRESETS.</h2></div>
-                    <button id="create-preset-btn" type="button" onclick="openPresetModal()" class="w-full bg-transparent border border-black text-black py-4 text-[10px] font-bold tracking-[0.2em] uppercase active:bg-zinc-100 transition-colors flex items-center justify-center gap-2 rounded-none">Save as Preset / </button>
+                    <button id="create-preset-btn" type="button" onclick="openPresetModal()" class="w-full bg-transparent border border-black text-black py-4 text-[10px] font-bold tracking-[0.2em] uppercase active:bg-zinc-100 transition-colors flex items-center justify-center gap-2 rounded-none">Save as Preset / 存为预设</button>
                     <div id="presets-list" class="flex flex-col gap-0 mt-2 border-b border-zinc-200"></div>
                 </div>
                 <div class="flex items-center justify-between mt-12 pt-4 border-t border-black">
                     <span class="text-[9px] font-bold text-zinc-400 tracking-[0.2em] uppercase">Current Status</span>
                     <div class="flex items-center gap-2 text-[10px] text-zinc-600">
                         <span id="global-status-dot" class="w-1.5 h-1.5 rounded-full bg-zinc-300"></span>
-                        <span id="global-status-text" class="tracking-widest"></span>
+                        <span id="global-status-text" class="tracking-widest">无生效配置</span>
                     </div>
                 </div>
             </div>
 
-            <!-- API  -->
+            <!-- API 保存弹窗 -->
             <div id="custom-modal" class="absolute inset-0 z-50 flex items-center justify-center bg-[#fcfbf8]/90 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
                 <div id="custom-modal-card" class="bg-white p-8 w-[85%] max-w-[320px] shadow-[0_20px_40px_rgba(0,0,0,0.08)] transform scale-95 transition-transform duration-300 flex flex-col gap-6 border border-black mb-32 rounded-none">
                     <div class="text-center border-b border-zinc-200 pb-4">
                         <h3 class="text-lg font-extrabold text-black tracking-widest mb-1 uppercase">Name Preset</h3>
-                        <p class="text-[9px] text-zinc-500 tracking-[0.1em] uppercase"></p>
+                        <p class="text-[9px] text-zinc-500 tracking-[0.1em] uppercase">给预设起个名字吧</p>
                     </div>
                     <input id="preset-name-input" type="text" placeholder="e.g. GPT-4 Pro" class="w-full bg-transparent border-b border-black py-3 text-center text-base text-black outline-none placeholder-zinc-300 rounded-none tracking-widest" />
                     <div class="flex flex-col gap-2 mt-2">
-                        <button type="button" ontouchstart="forceSave(event)" onmousedown="forceSave(event)" id="modal-save-btn" class="w-full py-4 bg-black text-white text-[10px] font-bold tracking-[0.3em] uppercase active:bg-zinc-800 transition-colors rounded-none">Confirm / </button>
-                        <button type="button" onclick="closePresetModal()" class="w-full py-3 bg-transparent text-zinc-400 text-[10px] font-bold tracking-[0.2em] uppercase active:text-black transition-colors rounded-none">Cancel / </button>
+                        <button type="button" ontouchstart="forceSave(event)" onmousedown="forceSave(event)" id="modal-save-btn" class="w-full py-4 bg-black text-white text-[10px] font-bold tracking-[0.3em] uppercase active:bg-zinc-800 transition-colors rounded-none">Confirm / 确认保存</button>
+                        <button type="button" onclick="closePresetModal()" class="w-full py-3 bg-transparent text-zinc-400 text-[10px] font-bold tracking-[0.2em] uppercase active:text-black transition-colors rounded-none">Cancel / 取消</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- ========================================================= -->
-        <!--  Lingo  -->
+        <!-- 💬 第三层：Lingo 聊天终端 -->
         <!-- ========================================================= -->
         <div id="screen-chat" class="absolute inset-0 bg-[#E5E5EA] flex flex-col transition-transform duration-[400ms] ease-[cubic-bezier(0.32,0.72,0,1)] w-full h-full z-30 translate-x-full font-modern">
             
@@ -191,7 +191,7 @@
                     </div>
                 </div>
                 <div class="px-5 py-2 flex items-start gap-4 overflow-x-auto no-scrollbar border-b border-zinc-100 min-h-[80px] transition-all duration-300" id="top-avatars-container">
-                    <div class="text-xs text-zinc-400 font-medium py-3 italic w-full text-center" id="empty-avatar-text"> Create </div>
+                    <div class="text-xs text-zinc-400 font-medium py-3 italic w-full text-center" id="empty-avatar-text">还没有角色哦，快去 Create 添加吧～</div>
                 </div>
                 <div class="flex-1 overflow-y-auto no-scrollbar flex flex-col px-3 pt-2" id="chat-list-container"></div>
             </div>
@@ -222,7 +222,7 @@
                 <p class="text-xs text-zinc-400 mt-1 font-medium">Lingo Network</p>
             </div>
 
-            <!--  -->
+            <!-- 底栏导航 -->
             <div class="absolute bottom-6 left-1/2 -translate-x-1/2 w-[85%] h-[60px] bg-white/85 backdrop-blur-xl border border-zinc-200/60 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.08)] flex items-center justify-around px-2 z-40">
                 <div onclick="switchChatTab('chat')" id="tab-chat" class="flex flex-col items-center justify-center gap-0.5 w-1/4 h-full cursor-pointer text-black transition-all group"><svg class="w-5 h-5 group-active:scale-90 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg><span class="text-[9px] font-semibold tracking-wide">Chats</span></div>
                 <div onclick="switchChatTab('discover')" id="tab-discover" class="flex flex-col items-center justify-center gap-0.5 w-1/4 h-full cursor-pointer text-zinc-400 hover:text-zinc-900 transition-all group"><svg class="w-5 h-5 group-active:scale-90 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span class="text-[9px] font-semibold tracking-wide">Explore</span></div>
@@ -230,7 +230,7 @@
                 <div onclick="switchChatTab('me')" id="tab-me" class="flex flex-col items-center justify-center gap-0.5 w-1/4 h-full cursor-pointer text-zinc-400 hover:text-zinc-900 transition-all group"><svg class="w-5 h-5 group-active:scale-90 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg><span class="text-[9px] font-semibold tracking-wide">Me</span></div>
             </div>
 
-            <!--  -->
+            <!-- 角色创建模态框 -->
             <div id="modal-create-form" class="absolute inset-0 z-[60] bg-white translate-y-full transition-transform duration-300 flex flex-col">
                 <div class="pt-12 pb-3 px-5 flex items-center justify-between border-b border-zinc-100">
                     <button onclick="toggleCreateForm(false)" class="text-zinc-500 font-medium text-sm">Cancel</button>
@@ -259,7 +259,7 @@
                 </div>
             </div>
 
-            <!--  -->
+            <!-- 真实聊天室模态框 -->
             <div id="page-chat-room" class="absolute inset-0 z-[70] bg-[#F2F2F7] translate-x-full transition-transform duration-300 flex flex-col">
                 <div class="pt-12 pb-3 px-4 flex items-center justify-between bg-white/90 backdrop-blur-md border-b border-zinc-200 z-10 shadow-sm">
                     <button onclick="closeChatRoom()" class="flex items-center text-zinc-900 active:opacity-50">
@@ -290,7 +290,7 @@
                 </div>
             </div>
 
-            <!--    -->
+            <!-- ✨ 新增：长按删除防误触确认弹窗 ✨ -->
             <div id="delete-modal" class="absolute inset-0 z-[80] flex items-center justify-center bg-zinc-900/40 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 font-modern">
                 <div id="delete-modal-card" class="bg-white p-6 w-[80%] max-w-[300px] shadow-[0_20px_60px_rgba(0,0,0,0.15)] transform scale-95 transition-transform duration-300 flex flex-col gap-5 rounded-3xl">
                     <div class="text-center mt-2">
@@ -308,7 +308,7 @@
 
     </div>
 
-    <!--  -->
+    <!-- 大脑中枢逻辑 -->
     <script>
         const memoryStorage = {};
         function safeSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { memoryStorage[k] = v; } }
@@ -326,7 +326,7 @@
         }
 
         // ==============================
-        //  
+        // 🏠 桌面
         // ==============================
         const cal = document.getElementById('calendar-container');
         let h = ''; ['S','M','T','W','T','F','S'].forEach(d => h+=`<div class="text-zinc-400 text-center text-[6px] font-bold mb-0.5">${d}</div>`);
@@ -343,7 +343,7 @@
         function swapPolaroids() { const p1=document.getElementById('polaroid-1'), p2=document.getElementById('polaroid-2'); ['-rotate-6','rotate-6','left-2','right-2','top-2','top-6','z-0','z-10','shadow-md','shadow-lg'].forEach(c=>{p1.classList.toggle(c);p2.classList.toggle(c);}); }
 
         // ==============================
-        //  API
+        // ⚙️ API
         // ==============================
         const urlInput = document.getElementById('api-url'); const keyInput = document.getElementById('api-key'); const modelSelect = document.getElementById('model-select');
         const statusText = document.getElementById('fetch-status'); const presetsList = document.getElementById('presets-list'); const saveBtn = document.getElementById('global-save-btn');
@@ -369,10 +369,10 @@
             showStatus('Connecting...', 'text-zinc-400');
             try {
                 const response = await fetch(`${url}/v1/models`, { method: 'GET', headers: { 'Authorization': `Bearer ${key}` } });
-                if(!response.ok) throw new Error('Key');
+                if(!response.ok) throw new Error('Key无效');
                 const data = await response.json(); modelSelect.innerHTML = '';
                 if(data.data && data.data.length > 0) { data.data.forEach(m => { const opt = document.createElement('option'); opt.value = m.id; opt.textContent = m.id; modelSelect.appendChild(opt); }); showStatus(`${data.data.length} Models Fetched.`, 'text-black font-bold'); } 
-                else throw new Error('');
+                else throw new Error('无模型');
             } catch(err) {
                 showStatus('Network blocked. Mock models loaded.', 'text-zinc-600');
                 const mockModels = ['gpt-3.5-turbo', 'gpt-4', 'gpt-4o', 'claude-3-opus', 'gemini-1.5-pro', 'deepseek-chat'];
@@ -383,7 +383,7 @@
         function getPresets() { return JSON.parse(safeGet('api_presets') || '[]'); }
         function openPresetModal() {
             const key = keyInput.value.trim(), model = modelSelect.value;
-            if(!key || !model) { const b = document.getElementById('create-preset-btn'), o = b.innerHTML; b.innerHTML = ` MISSING PARAMETERS`; b.classList.add('text-red-500', 'border-red-500'); setTimeout(() => { b.innerHTML = o; b.classList.remove('text-red-500', 'border-red-500'); }, 2000); return; }
+            if(!key || !model) { const b = document.getElementById('create-preset-btn'), o = b.innerHTML; b.innerHTML = `⚠️ MISSING PARAMETERS`; b.classList.add('text-red-500', 'border-red-500'); setTimeout(() => { b.innerHTML = o; b.classList.remove('text-red-500', 'border-red-500'); }, 2000); return; }
             nameInput.value = ''; modal.classList.remove('opacity-0', 'pointer-events-none'); modalCard.classList.remove('scale-95'); modalCard.classList.add('scale-100'); setTimeout(() => nameInput.focus(), 100);
         }
         function closePresetModal() { nameInput.blur(); modal.classList.add('opacity-0', 'pointer-events-none'); modalCard.classList.remove('scale-100'); modalCard.classList.add('scale-95'); }
@@ -395,7 +395,7 @@
                 const url = urlInput.value.trim() || 'https://api.openai.com', key = keyInput.value.trim(), model = modelSelect.value;
                 const newPreset = { id: Date.now().toString(), name: presetName, url: url, key: key, model: model };
                 const presets = getPresets(); presets.push(newPreset); safeSet('api_presets', JSON.stringify(presets));
-                renderPresets(); closePresetModal(); btn.innerText = 'Confirm / ';
+                renderPresets(); closePresetModal(); btn.innerText = 'Confirm / 确认保存';
             }, 50);
         }
         function loadPreset(id) { const presets = getPresets(), target = presets.find(p => p.id === id); if(target) { urlInput.value = target.url; keyInput.value = target.key; modelSelect.innerHTML = `<option value="${target.model}">${target.model}</option>`; showStatus('Preset loaded. Click SAVE above.', 'text-black font-bold'); } }
@@ -411,7 +411,7 @@
         }
 
         // ==============================
-        //  Lingo
+        // 💬 Lingo
         // ==============================
         let characters = JSON.parse(safeGet('lingo_chars') || '[]'); 
         let chats = JSON.parse(safeGet('lingo_chats') || '[]'); 
@@ -428,7 +428,7 @@
             safeSet('lingo_histories', JSON.stringify(chatHistories));
         }
 
-        //   
+        // ✨ 长按删除系统逻辑 ✨
         let pressTimer = null;
         let isLongPressTrigged = false;
         let deleteTarget = { type: null, id: null };
@@ -438,7 +438,7 @@
             pressTimer = setTimeout(() => {
                 isLongPressTrigged = true;
                 showDeleteModal(type, id);
-            }, 600); //  600ms 
+            }, 600); // 长按 600ms 触发
         }
 
         function cancelPress() {
@@ -464,7 +464,7 @@
             modal.classList.remove('opacity-0', 'pointer-events-none');
             card.classList.remove('scale-95');
             card.classList.add('scale-100');
-            // ()
+            // 触发长按时产生手机震动(如果设备支持)
             if (navigator.vibrate) navigator.vibrate(50);
         }
 
@@ -520,7 +520,7 @@
             if (charMatches.length > 0) { list.innerHTML = `<div class="px-3 pb-2 pt-2 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Characters Found</div>` + charMatches.map(c => renderSearchItem(c, 'Tap to start chatting')).join(''); } 
             else { const recordMatches = chats.filter(c => c.prompt && c.prompt.toLowerCase().includes(q));
                 if (recordMatches.length > 0) { list.innerHTML = `<div class="px-3 pb-2 pt-2 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Chat Records Found</div>` + recordMatches.map(c => renderSearchItem(c, `Matched keyword in history...`)).join(''); } 
-                else { list.innerHTML = `<div class="text-center text-zinc-400 text-[13px] mt-10 font-medium"> "${query}" </div>`; } }
+                else { list.innerHTML = `<div class="text-center text-zinc-400 text-[13px] mt-10 font-medium">没有找到关于 "${query}" 的结果</div>`; } }
         }
         function renderSearchItem(c, subtext) { return `<div onclick="openChatRoom(${c.id})" class="flex items-center gap-3 px-3 py-3 cursor-pointer hover:bg-zinc-50 rounded-2xl transition-colors">${c.avatarUrl ? `<img src="${c.avatarUrl}" class="w-11 h-11 rounded-full object-cover flex-shrink-0" />` : `<div class="w-11 h-11 rounded-full bg-gradient-to-tr ${c.color} flex items-center justify-center text-white flex-shrink-0"><span class="text-sm font-bold">${c.name.substring(0,1).toUpperCase()}</span></div>`}<div class="flex-1 border-b border-zinc-100 pb-2.5 pt-1.5"><span class="font-semibold text-[15px] text-zinc-900 block">${c.name}</span><p class="text-[13px] text-zinc-400 truncate font-medium italic">${subtext}</p></div></div>`; }
         
@@ -544,9 +544,9 @@
             saveAllLingoData(); document.getElementById('modal-create-form').classList.add('translate-y-full'); renderCharacters(); renderTopAvatars(); renderChatList(); if (!editingCharId) switchChatTab('chat');
         }
 
-        //   
+        // ✨ 卡片加上长按绑定，防误触设计 ✨
         function renderCharacters() {
-            const grid = document.getElementById('character-grid'); if(characters.length === 0) { grid.innerHTML = `<div class="col-span-2 text-center text-zinc-400 text-[13px] mt-10 font-medium"> + </div>`; return; }
+            const grid = document.getElementById('character-grid'); if(characters.length === 0) { grid.innerHTML = `<div class="col-span-2 text-center text-zinc-400 text-[13px] mt-10 font-medium">点击右上角 + 创建实体</div>`; return; }
             grid.innerHTML = characters.map(c => `
             <div 
                 onmousedown="startPress(event, 'character', ${c.id})" onmouseup="cancelPress()" onmouseleave="cancelPress()"
@@ -557,7 +557,7 @@
                 ${c.avatarUrl ? `<img src="${c.avatarUrl}" class="w-14 h-14 rounded-full object-cover ring-2 ring-white pointer-events-none" />` : `<div class="w-14 h-14 rounded-full bg-gradient-to-tr ${c.color} flex items-center justify-center text-white ring-2 ring-white pointer-events-none"><span class="text-base font-bold">${c.name.substring(0,1).toUpperCase()}</span></div>`}
                 <div class="flex flex-col items-center w-full pointer-events-none">
                     <span class="text-[13px] font-semibold text-zinc-800 truncate w-full text-center">${c.name}</span>
-                    ${(c.gender || c.age) ? `<span class="text-[10px] text-zinc-400 font-medium">${c.gender || '??'} � ${c.age || '??'}</span>` : ''}
+                    ${(c.gender || c.age) ? `<span class="text-[10px] text-zinc-400 font-medium">${c.gender || '??'} • ${c.age || '??'}</span>` : ''}
                 </div>
             </div>`).join('');
         }
@@ -567,12 +567,12 @@
             if (characters.length > 0) { 
                 container.innerHTML = characters.map(c => `<div onclick="openChatRoom(${c.id})" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform flex-shrink-0">${c.avatarUrl ? `<img src="${c.avatarUrl}" class="w-12 h-12 rounded-full object-cover ring-2 ring-transparent hover:ring-zinc-200 transition-all" />` : `<div class="w-12 h-12 rounded-full bg-gradient-to-tr ${c.color} flex items-center justify-center text-white ring-2 ring-transparent hover:ring-zinc-200 transition-all"><span class="text-sm font-bold">${c.name.substring(0,1).toUpperCase()}</span></div>`}<span class="text-[10px] font-semibold text-zinc-800 w-14 text-center truncate">${c.name}</span></div>`).join(''); 
             } else {
-                // 
-                container.innerHTML = `<div class="text-xs text-zinc-400 font-medium py-3 italic w-full text-center" id="empty-avatar-text"> Create </div>`;
+                // 修复：当最后一个角色被删除时，重新显示空提示文案
+                container.innerHTML = `<div class="text-xs text-zinc-400 font-medium py-3 italic w-full text-center" id="empty-avatar-text">还没有角色哦，快去 Create 添加吧～</div>`;
             }
         }
         
-        //   
+        // ✨ 聊天列表卡片加上长按绑定 ✨
         function renderChatList() {
             const list = document.getElementById('chat-list-container');
             list.innerHTML = chats.map(c => { 
@@ -650,7 +650,7 @@
             const typingId = 'typing-' + Date.now();
             const char = characters.find(c => c.id === currentChatId);
 
-            // 2
+            // 修复2：如果没有任何历史记录，初始化为空数组
             if(!chatHistories[currentChatId]) chatHistories[currentChatId] = [];
             const history = chatHistories[currentChatId];
 
@@ -659,7 +659,7 @@
             const isPrevSame = history.length > 0 && history[history.length - 1].role === 'ai';
             const mtClass = isPrevSame ? "mt-0.5" : "mt-4";
             
-            // 3 insertAdjacentHTML  innerHTML += 
+            // 修复3：使用 insertAdjacentHTML 而不是 innerHTML += 防止聊天记录闪烁
             container.insertAdjacentHTML('beforeend', `
             <div id="${typingId}" class="flex justify-start gap-2 w-full ${mtClass} items-end">
                 ${charAvatar}
@@ -676,23 +676,25 @@
             if (!apiKey) {
                 setTimeout(() => {
                     document.getElementById(typingId)?.remove();
-                    chatHistories[currentChatId].push({ role: 'error', text: " API  Secret Key" });
+                    chatHistories[currentChatId].push({ role: 'error', text: "系统提示：请先在桌面的 API 软件中配置 Secret Key。" });
                     saveAllLingoData(); renderChatMessages(); isReceiving = false;
                 }, 800); return;
             }
 
-            const systemPrompt = `${char.name}${char.gender || ''}${char.age || ''}
-
+            // 【重点修复：超强真人伪装+防语C动作描写系统提示词】
+            const systemPrompt = `你现在的身份是：${char.name}。你的性别是：${char.gender || '保密'}，年龄是：${char.age || '保密'}。
+你的核心设定和要求如下：
 ${char.prompt}
 
-
-1. AI
-2. 
-3. ****\\n
-4. 
-\\n\\n
-3
-5. `;
+【极其重要的回复规则，请绝对严格遵守】
+1. 你是一个活生生的人，正在用手机发微信/短信和我聊天，绝对不要暴露你是AI或助手。
+2. 绝对不要使用任何动作描述、神态描写、心理描写（例如 *笑着说*、(叹气)、【皱眉】、挥了挥手 等）！正常人打字聊天绝对不会带这些！
+3. 正常人聊天绝对不会把很多话挤在一个长气泡里发出来！你必须拆分！
+4. 如果你要说多句话，**必须**使用换行符（\\n）将句子隔开！系统会自动把每一行切分成单独的聊天气泡发送给用户！
+5. 示例：
+你好呀\\n今天吃了什么？\\n我想你了！
+（这就代表你发送了3条独立的消息，千万不要加序号或列表符号）
+6. 保持极度口语化、接地气！字数尽量精简，像真人发消息一样随性！`;
 
             const messagesPayload = [{ role: "system", content: systemPrompt }];
             const recentHistory = history.slice(-15);
@@ -713,11 +715,14 @@ ${char.prompt}
 
                 if (!response.ok) {
                     const errData = await response.json().catch(()=>({}));
-                    throw new Error(errData.error?.message || ` (: ${response.status})`);
+                    throw new Error(errData.error?.message || `网络请求失败 (状态码: ${response.status})`);
                 }
 
                 const data = await response.json();
-                const aiReply = data.choices[0].message.content;
+                let aiReply = data.choices[0].message.content;
+
+                // 双重保险：在代码层面强制剔除常见的动作描写符号内的内容
+                aiReply = aiReply.replace(/\*.*?\*/g, '').replace(/（.*?）/g, '').replace(/\(.*?\)/g, '').replace(/【.*?】/g, '');
 
                 const replies = aiReply.split('\n').map(s => s.trim()).filter(s => s.length > 0);
 
@@ -726,7 +731,7 @@ ${char.prompt}
                         const nextTypingId = 'typing-' + Date.now();
                         const chatBox = document.getElementById('chat-messages');
                         
-                        // 3 insertAdjacentHTML
+                        // 修复3：使用 insertAdjacentHTML
                         chatBox.insertAdjacentHTML('beforeend', `
                         <div id="${nextTypingId}" class="flex justify-start gap-2 w-full mt-0.5 items-end">
                             <div class="w-8 h-8 flex-shrink-0"></div>
@@ -748,7 +753,7 @@ ${char.prompt}
 
             } catch (error) {
                 document.getElementById(typingId)?.remove();
-                chatHistories[currentChatId].push({ role: 'error', text: `API ${error.message}` });
+                chatHistories[currentChatId].push({ role: 'error', text: `API 调用失败：${error.message}` });
                 saveAllLingoData(); renderChatMessages();
             } finally {
                 isReceiving = false;
